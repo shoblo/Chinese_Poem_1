@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>山字</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;500&display=swap">
+<style>
+/* Layout: one narrow column. A picture card, the character drawn stroke by stroke on a loop (tap to see the English word), then a short entry for children. Same ink-on-paper look as the painting page. */
+:root {
+  --ground: #dcdcd9; --paper: #f0f0ee; --square: #ffffff; --edge: #bdbdb9;
+  --ink: #1c1c1c; --ink-soft: #4a4a48; --rule: #c4c4c0; --ghost: #c2c2be;
+  --font-brush: 'Ma Shan Zheng', 'KaiTi', 'STKaiti', 'Kaiti SC', serif;
+  --font-body: 'Noto Serif SC', 'Songti SC', 'SimSun', serif;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+[hidden] { display: none !important; }
+body { background: var(--ground); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.75; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+.page { max-width: 560px; margin: 0 auto; padding-inline: 16px; padding-block: 20px 48px; display: flex; flex-direction: column; gap: 28px; }
+.top { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 16px; }
+.back { color: var(--ink-soft); font-size: 14px; text-decoration: none; border-bottom: 1px solid var(--rule); }
+.back:hover { color: var(--ink); border-bottom-color: var(--ink); }
+.context { margin: 0; font-family: var(--font-brush); font-size: 22px; line-height: 1.4; letter-spacing: 0.15em; color: var(--ink-soft); }
+.context b { font-weight: 400; color: var(--ink); border-bottom: 3px solid var(--ink); }
+.back:focus-visible, .glyph:focus-visible, .pager a:focus-visible { outline: 3px solid var(--ink); outline-offset: 4px; }
+.stage { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.demo { display: flex; align-items: flex-start; justify-content: center; gap: 14px; margin-bottom: 8px; max-width: 100%; }
+.square { width: min(62vw, 260px); aspect-ratio: 1; flex: 0 1 auto; max-width: 100%; background: var(--square); border: 1px solid var(--edge); transition: background-color 0.45s ease; }
+.swatches { display: flex; flex-direction: column; gap: 6px; flex: 0 0 auto; }
+.sw { width: 40px; height: 40px; padding: 0; border-radius: 50%; border: 2px solid var(--ink); background: var(--c); cursor: pointer; }
+.sw[aria-pressed="true"] { outline: 3px solid var(--ink); outline-offset: 3px; }
+.sw:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+.pinyin { margin: 0; font-size: 20px; line-height: 1.4; color: var(--ink-soft); min-height: 1.4em; text-align: center; }
+.square svg { display: block; width: 100%; height: 100%; }
+.glyph { width: 220px; max-width: 100%; height: 190px; padding: 0; background: transparent; color: var(--ink); border: 0; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+.glyph svg { width: 180px; height: 180px; display: block; }
+.live path { stroke-dasharray: 1 2; }
+.en-text { font-family: var(--font-body); font-size: 60px; font-weight: 500; letter-spacing: 0.04em; line-height: 1.15; text-align: center; padding: 0 8px; }
+.en-text.mid { font-size: 42px; }
+.en-text.long { font-size: 32px; }
+.stroke-label { margin: 0; min-height: 1.75em; font-family: var(--font-brush); font-size: 24px; line-height: 1.5; text-align: center; }
+.hint { margin: 0; font-size: 14px; color: var(--ink-soft); min-height: 1.75em; text-align: center; }
+.entry { display: flex; flex-direction: column; gap: 18px; border-top: 1px solid var(--rule); padding-top: 24px; }
+.entry h1 { margin: 0; font-family: var(--font-brush); font-weight: 400; font-size: 32px; line-height: 1.2; }
+.facts { display: grid; grid-template-columns: auto 1fr; gap: 6px 18px; margin: 0; }
+.facts dt { color: var(--ink-soft); font-size: 16px; }
+.facts dd { margin: 0; min-width: 0; font-size: 19px; }
+.entry h2 { margin: 0; font-family: var(--font-brush); font-weight: 400; font-size: 26px; line-height: 1.3; }
+.entry p { margin: 0; max-width: 30em; font-size: 19px; line-height: 1.9; }
+.words { display: flex; flex-wrap: wrap; gap: 10px 12px; margin: 0; padding: 0; list-style: none; }
+.words li { display: inline-flex; align-items: center; gap: 10px; font-family: var(--font-brush); font-size: 26px; line-height: 1.3; padding: 6px 18px 6px 10px; background: var(--square); border: 1px solid var(--ink); border-radius: 2px; }
+.words svg { width: 40px; height: 40px; flex: 0 0 auto; }
+.pager { display: flex; justify-content: space-between; gap: 12px; border-top: 1px solid var(--rule); padding-top: 20px; }
+.pager a { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 6px 18px; color: var(--ink); text-decoration: none; border: 1px solid var(--ink); border-radius: 2px; font-family: var(--font-brush); font-size: 26px; line-height: 1.2; }
+.pager a small { font-family: var(--font-body); font-size: 13px; color: var(--ink-soft); }
+.pager a:hover { background: var(--ink); color: var(--paper); }
+.pager a:hover small { color: var(--paper); }
+</style>
+</head>
+<body>
+<main class="page">
+<div class="top"><a class="back" id="back" href="./">回到画</a><p class="context" aria-label="白日依山尽">白日依<b>山</b>尽</p></div>
+
+<section class="stage" aria-label="山字">
+<div class="demo"><div class="square" id="square" role="img" aria-label="三座大山，最高的山顶有白雪，旁边有太阳和小树"><svg viewBox='0 0 100 100' stroke='#1c1c1c' stroke-width='2.5' stroke-linejoin='round' stroke-linecap='round'><rect width='100' height='100' fill='#f0f0ee' stroke='none'/><circle cx='80' cy='24' r='8' fill='#d6a940'/><path d='M8 80 L44 20 L80 80 Z' fill='#9c9c9a'/><path d='M44 20 L33 38 L40 34 L45 41 L51 34 L55 38 Z' fill='#ffffff'/><path d='M8 80 L22 56 L36 80 Z' fill='#5d6a42'/><path d='M62 80 L77 54 L92 80 Z' fill='#5d6a42'/><rect x='0' y='80' width='100' height='20' fill='#f3d9b1'/><path d='M0 80 H100'/><path d='M20 88 L26 76 L32 88 Z M70 90 L77 77 L84 90 Z' fill='#5d6a42'/><path d='M26 88 V93 M77 90 V95'/></svg></div></div>
+<button class="glyph" id="glyph" type="button" aria-label="山，点一下换成英文">
+<svg class="gsvg" id="g-main" viewBox="0 0 1024 1024" aria-hidden="true"><defs><clipPath id="maink0"><path d="M 536 209 Q 546 407 552 587 Q 556 633 562 664 Q 569 691 574 710 Q 578 723 554 740 Q 512 762 484 767 Q 465 771 456 760 Q 447 751 457 734 Q 488 688 489 655 Q 499 444 488 200 C 487 170 534 179 536 209 Z"/></clipPath><clipPath id="maink1"><path d="M 796 244 Q 657 232 536 209 L 488 200 Q 379 182 284 155 Q 256 148 263 180 Q 267 253 272 329 Q 275 357 263 373 Q 220 416 190 409 Q 178 403 188 382 Q 224 309 215 236 Q 211 166 182 133 Q 161 112 170 96 Q 183 78 203 66 Q 219 57 230 67 Q 243 83 283 99 Q 440 151 606 182 Q 757 210 789 197 C 819 193 826 247 796 244 Z"/></clipPath><clipPath id="maink2"><path d="M 789 197 Q 783 166 774 145 Q 756 118 785 55 Q 795 36 809 49 Q 837 73 846 173 Q 868 386 890 427 Q 900 443 889 460 Q 867 479 831 501 Q 816 510 802 503 Q 793 499 796 484 Q 823 435 796 244 L 789 197 Z"/></clipPath></defs><g transform="scale(1,-1) translate(0,-900)"><g fill="#c2c2be"><path d="M 536 209 Q 546 407 552 587 Q 556 633 562 664 Q 569 691 574 710 Q 578 723 554 740 Q 512 762 484 767 Q 465 771 456 760 Q 447 751 457 734 Q 488 688 489 655 Q 499 444 488 200 C 487 170 534 179 536 209 Z"/><path d="M 796 244 Q 657 232 536 209 L 488 200 Q 379 182 284 155 Q 256 148 263 180 Q 267 253 272 329 Q 275 357 263 373 Q 220 416 190 409 Q 178 403 188 382 Q 224 309 215 236 Q 211 166 182 133 Q 161 112 170 96 Q 183 78 203 66 Q 219 57 230 67 Q 243 83 283 99 Q 440 151 606 182 Q 757 210 789 197 C 819 193 826 247 796 244 Z"/><path d="M 789 197 Q 783 166 774 145 Q 756 118 785 55 Q 795 36 809 49 Q 837 73 846 173 Q 868 386 890 427 Q 900 443 889 460 Q 867 479 831 501 Q 816 510 802 503 Q 793 499 796 484 Q 823 435 796 244 L 789 197 Z"/></g><g class="live" id="live-main" fill="none" stroke="#1c1c1c" stroke-width="200" stroke-linecap="round" stroke-linejoin="round"><g clip-path="url(#maink0)"><path pathLength="1" d="M472 748L525 700L514 235L493 208"/></g><g clip-path="url(#maink1)"><path pathLength="1" d="M196 398L217 379L239 340L243 263L233 126L282 127L380 155L575 197L710 218L772 221L788 237"/></g><g clip-path="url(#maink2)"><path pathLength="1" d="M810 490L826 477L849 433L798 57"/></g></g></g></svg>
+<span class="en-text" id="en" hidden>mountain</span>
+</button>
+<p class="pinyin" id="pinyin" lang="zh-Latn">shān</p>
+<p class="stroke-label" id="label" aria-hidden="true" hidden></p>
+<p class="hint" id="hint"></p>
+</section>
+
+<article class="entry">
+
+
+
+
+<section>
+<h2>山的好朋友</h2>
+<ul class="words">
+<li>
+<svg aria-hidden="true" viewBox='0 0 48 48' fill='none' stroke='currentColor' stroke-width='2' stroke-linejoin='round' stroke-linecap='round'><path d='M4 40 L24 8 L44 40 Z' fill='#9c9c9a'/><path d='M24 8 L17 19 L22 17 L25 21 L29 17 L31 19 Z' fill='#ffffff'/></svg>
+大山</li>
+<li>
+<svg aria-hidden="true" viewBox='0 0 48 48' fill='none' stroke='currentColor' stroke-width='2' stroke-linejoin='round' stroke-linecap='round'><path d='M6 42 L17 18 H31 L42 42 Z' fill='#5a4a3a'/><path d='M17 18 C20 14 28 14 31 18 Z' fill='#cf4a3c'/><circle cx='22' cy='9' r='3' fill='#cfcfcc'/><circle cx='28' cy='5' r='3' fill='#cfcfcc'/><path d='M24 24 L22 32' stroke='#cf4a3c'/></svg>
+火山</li>
+<li>
+<svg aria-hidden="true" viewBox='0 0 48 48' fill='none' stroke='currentColor' stroke-width='2' stroke-linejoin='round' stroke-linecap='round'><ellipse cx='22' cy='25' rx='13' ry='8' fill='#ffffff'/><path d='M14 31 V42 M20 32 V42 M27 32 V42 M33 30 V42'/><circle cx='38' cy='17' r='5.5' fill='#ffffff'/><path d='M36 12 C35 6 31 6 30 8 M39 12 C40 6 44 6 44 9'/><path d='M40 22 L39 28 L42 23' fill='#ffffff'/><circle cx='39.5' cy='16' r='1.2' fill='currentColor' stroke='none'/><path d='M9 22 L6 19'/></svg>
+山羊</li>
+<li>
+<svg aria-hidden="true" viewBox='0 0 48 48' fill='none' stroke='currentColor' stroke-width='2' stroke-linejoin='round' stroke-linecap='round'><path d='M2 44 L26 10 L46 44 Z' fill='#9c9c9a'/><path d='M8 40 L20 33 L14 30 L24 22' stroke='#f3d9b1' stroke-width='2.4'/><circle cx='28' cy='19' r='3' fill='#ffffff'/><path d='M28 22 L25 31 M26 25 L31 28 M25 31 L30 38'/><path d='M34 24 V38' stroke-width='1.6'/></svg>
+爬山</li>
+</ul>
+</section>
+</article>
+
+<nav class="pager" aria-label="翻页"><a href="z03.html" aria-label="上一个字：依">←<span>依</span></a><a href="z05.html" aria-label="下一个字：尽"><span>尽</span>→</a></nav>
+</main>
+
+<script>
+(function () {
+  var V = [{"key":"main","char":"山","pinyin":"shān","english":"mountain","color":"#1c1c1c","bg":null,"names":["竖","竖折","竖"]}];
+  var START_INDEX = 0;
+  var glyph = document.getElementById('glyph');
+  var enText = document.getElementById('en');
+  var label = document.getElementById('label');
+  var hint = document.getElementById('hint');
+  var pinyinEl = document.getElementById('pinyin');
+  var square = document.getElementById('square');
+  var back = document.getElementById('back');
+  var swatches = Array.prototype.slice.call(document.querySelectorAll('.sw'));
+  var svgs = V.map(function (v) { return document.getElementById('g-' + v.key); });
+  var lives = V.map(function (v) { return document.getElementById('live-' + v.key); });
+  var strokesOf = lives.map(function (l) { return Array.prototype.slice.call(l.querySelectorAll('path')); });
+  var numerals = ['一','二','三','四','五','六','七','八','九','十','十一','十二','十三','十四','十五'];
+  var reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  var DEFAULT_HINT = "";
+  var cur = START_INDEX, english = false, t0 = 0, raf = 0, lastLabel = '';
+  var count = 0, START = 400, DUR = 900, STEP = 1200, HOLD = 1500, FADE = 600, FADE_AT = 0, CYCLE = 0;
+  function timing() {
+    count = strokesOf[cur].length;
+    DUR = count <= 6 ? 900 : 750;
+    STEP = count <= 6 ? 1200 : 1000;
+    FADE_AT = START + (count - 1) * STEP + DUR + HOLD;
+    CYCLE = FADE_AT + FADE;
+  }
+  function show(el, on) { if (on) el.removeAttribute('hidden'); else el.setAttribute('hidden', ''); }
+  function setLabel(text) { if (text !== lastLabel) { label.textContent = text; lastLabel = text; } }
+  function ease(p) { return p * p * (3 - 2 * p); }
+  function draw(t) {
+    var v = V[cur], strokes = strokesOf[cur], i, p, started = -1, done = 0;
+    for (i = 0; i < count; i++) {
+      p = (t - (START + i * STEP)) / DUR;
+      p = p < 0 ? 0 : (p > 1 ? 1 : p);
+      if (p > 0) started = i;
+      if (p >= 1) done++;
+      strokes[i].style.strokeDashoffset = String(1 - ease(p));
+      strokes[i].style.opacity = p > 0 ? '1' : '0';
+    }
+    lives[cur].style.opacity = t > FADE_AT ? String(Math.max(0, 1 - (t - FADE_AT) / FADE)) : '1';
+    if (started < 0) setLabel('看一看，' + v.char + '是怎么写的');
+    else if (done === count) setLabel('写好啦，一共 ' + count + ' 笔');
+    else setLabel('第' + numerals[started] + '笔' + (v.names[started] ? '：' + v.names[started] : ''));
+  }
+  function drawAll() {
+    var v = V[cur], strokes = strokesOf[cur], i;
+    for (i = 0; i < count; i++) { strokes[i].style.strokeDashoffset = '0'; strokes[i].style.opacity = '1'; }
+    lives[cur].style.opacity = '1';
+    setLabel(v.names.every(function (x) { return x; }) ? '笔顺：' + v.names.join('、') : '一共 ' + count + ' 笔');
+  }
+  function tick(now) { draw((now - t0) % CYCLE); raf = window.requestAnimationFrame(tick); }
+  function stop() { if (raf) { window.cancelAnimationFrame(raf); raf = 0; } }
+  function start() {
+    stop();
+    lastLabel = null;
+    timing();
+    if (reduce) { drawAll(); return; }
+    t0 = performance.now();
+    raf = window.requestAnimationFrame(tick);
+  }
+  function select(i) {
+    var v = V[i];
+    cur = i; english = false;
+    svgs.forEach(function (el, k) { show(el, k === i); });
+    show(enText, false);
+    if (square && v.bg) square.style.backgroundColor = v.bg;
+    swatches.forEach(function (b, k) { b.setAttribute('aria-pressed', k === i ? 'true' : 'false'); });
+    pinyinEl.textContent = v.pinyin;
+    glyph.setAttribute('aria-label', v.char + '，' + v.pinyin + '，点一下换成英文');
+    hint.textContent = DEFAULT_HINT;
+    start();
+  }
+  window.glyphSeek = function (ms) { stop(); timing(); draw(ms); };
+  window.glyphSelect = function (i) { select(i); };
+  glyph.addEventListener('click', function () {
+    var v = V[cur];
+    english = !english;
+    if (english) {
+      stop();
+      svgs.forEach(function (el) { show(el, false); });
+      enText.textContent = v.english;
+      enText.className = 'en-text' + (v.english.length > 12 ? ' long' : (v.english.length > 6 ? ' mid' : ''));
+      enText.style.color = v.color;
+      show(enText, true);
+      pinyinEl.textContent = '';
+      setLabel('');
+      glyph.setAttribute('aria-label', v.english + '，点一下变回汉字');
+      hint.textContent = '再点一下，变回汉字。';
+    } else {
+      show(enText, false);
+      show(svgs[cur], true);
+      pinyinEl.textContent = v.pinyin;
+      glyph.setAttribute('aria-label', v.char + '，' + v.pinyin + '，点一下换成英文');
+      hint.textContent = DEFAULT_HINT;
+      start();
+    }
+  });
+  swatches.forEach(function (b, k) { b.addEventListener('click', function () { select(k); }); });
+  back.addEventListener('click', function (e) {
+    try { if (document.referrer && window.history.length > 1) { e.preventDefault(); window.history.back(); } } catch (err) {}
+  });
+  select(START_INDEX);
+})();
+</script>
+</body>
+</html>

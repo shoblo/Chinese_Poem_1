@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>更字</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;500&display=swap">
+<style>
+/* Layout: one narrow column. A picture card, the character drawn stroke by stroke on a loop (tap to see the English word), then a short entry for children. Same ink-on-paper look as the painting page. */
+:root {
+  --ground: #dcdcd9; --paper: #f0f0ee; --square: #ffffff; --edge: #bdbdb9;
+  --ink: #1c1c1c; --ink-soft: #4a4a48; --rule: #c4c4c0; --ghost: #c2c2be;
+  --font-brush: 'Ma Shan Zheng', 'KaiTi', 'STKaiti', 'Kaiti SC', serif;
+  --font-body: 'Noto Serif SC', 'Songti SC', 'SimSun', serif;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+[hidden] { display: none !important; }
+body { background: var(--ground); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.75; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+.page { max-width: 560px; margin: 0 auto; padding-inline: 16px; padding-block: 20px 48px; display: flex; flex-direction: column; gap: 28px; }
+.top { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 16px; }
+.back { color: var(--ink-soft); font-size: 14px; text-decoration: none; border-bottom: 1px solid var(--rule); }
+.back:hover { color: var(--ink); border-bottom-color: var(--ink); }
+.context { margin: 0; font-family: var(--font-brush); font-size: 22px; line-height: 1.4; letter-spacing: 0.15em; color: var(--ink-soft); }
+.context b { font-weight: 400; color: var(--ink); border-bottom: 3px solid var(--ink); }
+.back:focus-visible, .glyph:focus-visible, .pager a:focus-visible { outline: 3px solid var(--ink); outline-offset: 4px; }
+.stage { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.demo { display: flex; align-items: flex-start; justify-content: center; gap: 14px; margin-bottom: 8px; max-width: 100%; }
+.square { width: min(62vw, 260px); aspect-ratio: 1; flex: 0 1 auto; max-width: 100%; background: var(--square); border: 1px solid var(--edge); transition: background-color 0.45s ease; }
+.swatches { display: flex; flex-direction: column; gap: 6px; flex: 0 0 auto; }
+.sw { width: 40px; height: 40px; padding: 0; border-radius: 50%; border: 2px solid var(--ink); background: var(--c); cursor: pointer; }
+.sw[aria-pressed="true"] { outline: 3px solid var(--ink); outline-offset: 3px; }
+.sw:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+.pinyin { margin: 0; font-size: 20px; line-height: 1.4; color: var(--ink-soft); min-height: 1.4em; text-align: center; }
+.square svg { display: block; width: 100%; height: 100%; }
+.glyph { width: 220px; max-width: 100%; height: 190px; padding: 0; background: transparent; color: var(--ink); border: 0; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+.glyph svg { width: 180px; height: 180px; display: block; }
+.live path { stroke-dasharray: 1 2; }
+.en-text { font-family: var(--font-body); font-size: 60px; font-weight: 500; letter-spacing: 0.04em; line-height: 1.15; text-align: center; padding: 0 8px; }
+.en-text.mid { font-size: 42px; }
+.en-text.long { font-size: 32px; }
+.stroke-label { margin: 0; min-height: 1.75em; font-family: var(--font-brush); font-size: 24px; line-height: 1.5; text-align: center; }
+.hint { margin: 0; font-size: 14px; color: var(--ink-soft); min-height: 1.75em; text-align: center; }
+.entry { display: flex; flex-direction: column; gap: 18px; border-top: 1px solid var(--rule); padding-top: 24px; }
+.entry h1 { margin: 0; font-family: var(--font-brush); font-weight: 400; font-size: 32px; line-height: 1.2; }
+.facts { display: grid; grid-template-columns: auto 1fr; gap: 6px 18px; margin: 0; }
+.facts dt { color: var(--ink-soft); font-size: 16px; }
+.facts dd { margin: 0; min-width: 0; font-size: 19px; }
+.entry h2 { margin: 0; font-family: var(--font-brush); font-weight: 400; font-size: 26px; line-height: 1.3; }
+.entry p { margin: 0; max-width: 30em; font-size: 19px; line-height: 1.9; }
+.words { display: flex; flex-wrap: wrap; gap: 10px 12px; margin: 0; padding: 0; list-style: none; }
+.words li { display: inline-flex; align-items: center; gap: 10px; font-family: var(--font-brush); font-size: 26px; line-height: 1.3; padding: 6px 18px 6px 10px; background: var(--square); border: 1px solid var(--ink); border-radius: 2px; }
+.words svg { width: 40px; height: 40px; flex: 0 0 auto; }
+.pager { display: flex; justify-content: space-between; gap: 12px; border-top: 1px solid var(--rule); padding-top: 20px; }
+.pager a { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 6px 18px; color: var(--ink); text-decoration: none; border: 1px solid var(--ink); border-radius: 2px; font-family: var(--font-brush); font-size: 26px; line-height: 1.2; }
+.pager a small { font-family: var(--font-body); font-size: 13px; color: var(--ink-soft); }
+.pager a:hover { background: var(--ink); color: var(--paper); }
+.pager a:hover small { color: var(--paper); }
+</style>
+</head>
+<body>
+<main class="page">
+<div class="top"><a class="back" id="back" href="./">回到画</a><p class="context" aria-label="更上一层楼"><b>更</b>上一层楼</p></div>
+
+<section class="stage" aria-label="更字">
+<div class="demo"><div class="square" id="square" role="img" aria-label="一棵矮树和一棵更高的树，旁边有向上的箭头"><svg viewBox='0 0 100 100' fill='none' stroke='#1c1c1c' stroke-width='2.5' stroke-linejoin='round' stroke-linecap='round'><rect x='0' y='0' width='100' height='100' fill='#f0f0ee' stroke='none'/><rect x='0' y='84' width='100' height='16' fill='#f3d9b1' stroke='none'/><path d='M0 84 H100'/><rect x='19' y='68' width='6' height='16' fill='#5a4a3a'/><circle cx='22' cy='58' r='13' fill='#5d6a42'/><rect x='50' y='46' width='8' height='38' fill='#5a4a3a'/><ellipse cx='54' cy='32' rx='16' ry='21' fill='#5d6a42'/><path d='M82 64 V30' stroke='#cf4a3c' stroke-width='4'/><path d='M74 39 L82 30 L90 39' stroke='#cf4a3c' stroke-width='4'/></svg></div></div>
+<button class="glyph" id="glyph" type="button" aria-label="更，点一下换成英文">
+<svg class="gsvg" id="g-main" viewBox="0 0 1024 1024" aria-hidden="true"><defs><clipPath id="maink0"><path d="M 503 726 Q 576 742 655 757 Q 707 769 715 776 Q 725 785 720 794 Q 711 807 678 816 Q 650 822 546 789 Q 423 759 331 750 Q 291 743 320 724 Q 365 696 430 711 Q 431 712 434 711 L 503 726 Z"/></clipPath><clipPath id="maink1"><path d="M 305 583 Q 281 596 256 600 Q 249 601 244 597 Q 237 590 247 580 Q 286 532 303 401 Q 310 338 348 316 Q 349 316 351 315 Q 367 312 368 338 L 364 372 Q 360 391 353 410 Q 331 534 330 546 C 326 572 326 572 305 583 Z"/></clipPath><clipPath id="maink2"><path d="M 615 368 Q 634 335 652 324 Q 664 314 682 338 Q 700 365 742 511 Q 752 545 780 573 Q 796 586 783 603 Q 767 622 719 653 Q 698 665 614 643 Q 599 643 519 624 L 465 614 Q 449 613 432 608 Q 360 593 305 583 C 276 578 302 535 330 546 Q 339 555 467 580 L 518 590 Q 656 621 676 602 Q 689 584 686 568 Q 649 412 632 398 C 617 372 615 368 615 368 Z"/></clipPath><clipPath id="maink3"><path d="M 521 473 Q 561 480 598 486 Q 623 490 613 504 Q 603 519 575 524 Q 553 527 520 517 L 470 503 Q 424 490 383 478 Q 367 474 388 459 Q 398 452 419 455 Q 444 461 470 464 L 521 473 Z"/></clipPath><clipPath id="maink4"><path d="M 517 359 Q 560 365 615 368 C 645 370 658 382 632 398 Q 604 420 519 398 L 467 387 Q 412 378 364 372 C 334 368 338 337 368 338 Q 375 338 383 339 Q 416 346 465 352 L 517 359 Z"/></clipPath><clipPath id="maink5"><path d="M 476 177 Q 504 234 517 359 L 519 398 Q 520 435 521 473 L 520 517 Q 520 554 519 585 Q 518 588 518 590 L 519 624 Q 520 658 530 694 Q 534 706 525 713 Q 516 720 503 726 C 478 742 415 734 434 711 Q 459 686 463 658 Q 464 636 465 614 L 467 580 Q 468 541 470 503 L 470 464 Q 470 424 467 387 L 465 352 Q 453 253 429 211 L 405 176 Q 347 103 148 28 Q 135 25 131 21 Q 125 17 140 12 Q 162 11 238 30 Q 293 43 369 80 Q 417 105 447 137 L 476 177 Z"/></clipPath><clipPath id="maink6"><path d="M 447 137 Q 588 14 688 -37 Q 739 -55 932 -15 Q 945 -9 949 0 Q 953 10 929 12 Q 859 28 782 38 Q 643 62 476 177 L 429 211 Q 423 215 417 221 Q 309 311 245 305 Q 232 304 222 301 Q 212 295 217 286 Q 224 276 237 276 Q 276 273 405 176 L 447 137 Z"/></clipPath></defs><g transform="scale(1,-1) translate(0,-900)"><g fill="#c2c2be"><path d="M 503 726 Q 576 742 655 757 Q 707 769 715 776 Q 725 785 720 794 Q 711 807 678 816 Q 650 822 546 789 Q 423 759 331 750 Q 291 743 320 724 Q 365 696 430 711 Q 431 712 434 711 L 503 726 Z"/><path d="M 305 583 Q 281 596 256 600 Q 249 601 244 597 Q 237 590 247 580 Q 286 532 303 401 Q 310 338 348 316 Q 349 316 351 315 Q 367 312 368 338 L 364 372 Q 360 391 353 410 Q 331 534 330 546 C 326 572 326 572 305 583 Z"/><path d="M 615 368 Q 634 335 652 324 Q 664 314 682 338 Q 700 365 742 511 Q 752 545 780 573 Q 796 586 783 603 Q 767 622 719 653 Q 698 665 614 643 Q 599 643 519 624 L 465 614 Q 449 613 432 608 Q 360 593 305 583 C 276 578 302 535 330 546 Q 339 555 467 580 L 518 590 Q 656 621 676 602 Q 689 584 686 568 Q 649 412 632 398 C 617 372 615 368 615 368 Z"/><path d="M 521 473 Q 561 480 598 486 Q 623 490 613 504 Q 603 519 575 524 Q 553 527 520 517 L 470 503 Q 424 490 383 478 Q 367 474 388 459 Q 398 452 419 455 Q 444 461 470 464 L 521 473 Z"/><path d="M 517 359 Q 560 365 615 368 C 645 370 658 382 632 398 Q 604 420 519 398 L 467 387 Q 412 378 364 372 C 334 368 338 337 368 338 Q 375 338 383 339 Q 416 346 465 352 L 517 359 Z"/><path d="M 476 177 Q 504 234 517 359 L 519 398 Q 520 435 521 473 L 520 517 Q 520 554 519 585 Q 518 588 518 590 L 519 624 Q 520 658 530 694 Q 534 706 525 713 Q 516 720 503 726 C 478 742 415 734 434 711 Q 459 686 463 658 Q 464 636 465 614 L 467 580 Q 468 541 470 503 L 470 464 Q 470 424 467 387 L 465 352 Q 453 253 429 211 L 405 176 Q 347 103 148 28 Q 135 25 131 21 Q 125 17 140 12 Q 162 11 238 30 Q 293 43 369 80 Q 417 105 447 137 L 476 177 Z"/><path d="M 447 137 Q 588 14 688 -37 Q 739 -55 932 -15 Q 945 -9 949 0 Q 953 10 929 12 Q 859 28 782 38 Q 643 62 476 177 L 429 211 Q 423 215 417 221 Q 309 311 245 305 Q 232 304 222 301 Q 212 295 217 286 Q 224 276 237 276 Q 276 273 405 176 L 447 137 Z"/></g><g class="live" id="live-main" fill="none" stroke="#1c1c1c" stroke-width="200" stroke-linecap="round" stroke-linejoin="round"><g clip-path="url(#maink0)"><path pathLength="1" d="M323 738L360 730L401 732L637 784L708 788"/></g><g clip-path="url(#maink1)"><path pathLength="1" d="M252 590L288 563L303 534L330 395L354 328"/></g><g clip-path="url(#maink2)"><path pathLength="1" d="M312 579L340 571L629 629L669 632L703 623L732 588L678 413L657 368L660 335"/></g><g clip-path="url(#maink3)"><path pathLength="1" d="M386 469L422 472L547 501L579 504L603 497"/></g><g clip-path="url(#maink4)"><path pathLength="1" d="M372 367L382 357L625 395"/></g><g clip-path="url(#maink5)"><path pathLength="1" d="M442 707L492 687L493 679L492 352L477 264L461 213L423 152L363 105L265 56L137 18"/></g><g clip-path="url(#maink6)"><path pathLength="1" d="M229 290L262 287L318 264L362 237L544 96L649 33L697 11L764 -1L939 1"/></g></g></g></svg>
+<span class="en-text" id="en" hidden>even more</span>
+</button>
+<p class="pinyin" id="pinyin" lang="zh-Latn">gèng</p>
+<p class="stroke-label" id="label" aria-hidden="true" hidden></p>
+<p class="hint" id="hint"></p>
+</section>
+
+<article class="entry">
+
+
+
+
+<section>
+<h2>更的好朋友</h2>
+<ul class="words">
+<li>
+<svg aria-hidden="true" viewBox='0 0 48 48' fill='none' stroke='currentColor' stroke-width='2' stroke-linejoin='round' stroke-linecap='round'><rect x='9' y='33' width='4' height='10' fill='#5a4a3a'/><circle cx='11' cy='28' r='7' fill='#5d6a42'/><rect x='30' y='24' width='5' height='19' fill='#5a4a3a'/><ellipse cx='32.5' cy='15' rx='9' ry='12' fill='#5d6a42'/><path d='M3 43 H45'/></svg>
+更高</li>
+<li>
+<svg aria-hidden="true" viewBox='0 0 48 48' fill='none' stroke='currentColor' stroke-width='2' stroke-linejoin='round' stroke-linecap='round'><path d='M17 12 H25 L26 20 L37 25 Q43 27 43 33 V37 H17 Z' fill='#cf4a3c'/><path d='M17 37 H43 V41 H17 Z' fill='#ffffff'/><path d='M3 17 H11'/><path d='M2 25 H11'/><path d='M4 33 H11'/></svg>
+更快</li>
+<li>
+<svg aria-hidden="true" viewBox='0 0 48 48' fill='none' stroke='currentColor' stroke-width='2' stroke-linejoin='round' stroke-linecap='round'><path d='M24 5 L29.5 17 L42.5 18.5 L32.8 27.3 L35.6 40.5 L24 33.8 L12.4 40.5 L15.2 27.3 L5.5 18.5 L18.5 17 Z' fill='#d6a940'/></svg>
+更好</li>
+<li>
+<svg aria-hidden="true" viewBox='0 0 48 48' fill='none' stroke='currentColor' stroke-width='2' stroke-linejoin='round' stroke-linecap='round'><ellipse cx='30' cy='18' rx='12' ry='14' fill='#cf4a3c'/><path d='M27 32 H33 L30 36 Z' fill='#cf4a3c'/><path d='M30 36 Q26 40 30 46'/><ellipse cx='10' cy='31' rx='6' ry='7' fill='#7d9bb0'/><path d='M8 38 H12 L10 41 Z' fill='#7d9bb0'/><path d='M10 41 Q7 44 10 47'/></svg>
+更大</li>
+</ul>
+</section>
+</article>
+
+<nav class="pager" aria-label="翻页"><a href="z15.html" aria-label="上一个字：目">←<span>目</span></a><a href="z17.html" aria-label="下一个字：上"><span>上</span>→</a></nav>
+</main>
+
+<script>
+(function () {
+  var V = [{"key":"main","char":"更","pinyin":"gèng","english":"even more","color":"#1c1c1c","bg":null,"names":["横","竖","横折","横","横","撇","捺"]}];
+  var START_INDEX = 0;
+  var glyph = document.getElementById('glyph');
+  var enText = document.getElementById('en');
+  var label = document.getElementById('label');
+  var hint = document.getElementById('hint');
+  var pinyinEl = document.getElementById('pinyin');
+  var square = document.getElementById('square');
+  var back = document.getElementById('back');
+  var swatches = Array.prototype.slice.call(document.querySelectorAll('.sw'));
+  var svgs = V.map(function (v) { return document.getElementById('g-' + v.key); });
+  var lives = V.map(function (v) { return document.getElementById('live-' + v.key); });
+  var strokesOf = lives.map(function (l) { return Array.prototype.slice.call(l.querySelectorAll('path')); });
+  var numerals = ['一','二','三','四','五','六','七','八','九','十','十一','十二','十三','十四','十五'];
+  var reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  var DEFAULT_HINT = "";
+  var cur = START_INDEX, english = false, t0 = 0, raf = 0, lastLabel = '';
+  var count = 0, START = 400, DUR = 900, STEP = 1200, HOLD = 1500, FADE = 600, FADE_AT = 0, CYCLE = 0;
+  function timing() {
+    count = strokesOf[cur].length;
+    DUR = count <= 6 ? 900 : 750;
+    STEP = count <= 6 ? 1200 : 1000;
+    FADE_AT = START + (count - 1) * STEP + DUR + HOLD;
+    CYCLE = FADE_AT + FADE;
+  }
+  function show(el, on) { if (on) el.removeAttribute('hidden'); else el.setAttribute('hidden', ''); }
+  function setLabel(text) { if (text !== lastLabel) { label.textContent = text; lastLabel = text; } }
+  function ease(p) { return p * p * (3 - 2 * p); }
+  function draw(t) {
+    var v = V[cur], strokes = strokesOf[cur], i, p, started = -1, done = 0;
+    for (i = 0; i < count; i++) {
+      p = (t - (START + i * STEP)) / DUR;
+      p = p < 0 ? 0 : (p > 1 ? 1 : p);
+      if (p > 0) started = i;
+      if (p >= 1) done++;
+      strokes[i].style.strokeDashoffset = String(1 - ease(p));
+      strokes[i].style.opacity = p > 0 ? '1' : '0';
+    }
+    lives[cur].style.opacity = t > FADE_AT ? String(Math.max(0, 1 - (t - FADE_AT) / FADE)) : '1';
+    if (started < 0) setLabel('看一看，' + v.char + '是怎么写的');
+    else if (done === count) setLabel('写好啦，一共 ' + count + ' 笔');
+    else setLabel('第' + numerals[started] + '笔' + (v.names[started] ? '：' + v.names[started] : ''));
+  }
+  function drawAll() {
+    var v = V[cur], strokes = strokesOf[cur], i;
+    for (i = 0; i < count; i++) { strokes[i].style.strokeDashoffset = '0'; strokes[i].style.opacity = '1'; }
+    lives[cur].style.opacity = '1';
+    setLabel(v.names.every(function (x) { return x; }) ? '笔顺：' + v.names.join('、') : '一共 ' + count + ' 笔');
+  }
+  function tick(now) { draw((now - t0) % CYCLE); raf = window.requestAnimationFrame(tick); }
+  function stop() { if (raf) { window.cancelAnimationFrame(raf); raf = 0; } }
+  function start() {
+    stop();
+    lastLabel = null;
+    timing();
+    if (reduce) { drawAll(); return; }
+    t0 = performance.now();
+    raf = window.requestAnimationFrame(tick);
+  }
+  function select(i) {
+    var v = V[i];
+    cur = i; english = false;
+    svgs.forEach(function (el, k) { show(el, k === i); });
+    show(enText, false);
+    if (square && v.bg) square.style.backgroundColor = v.bg;
+    swatches.forEach(function (b, k) { b.setAttribute('aria-pressed', k === i ? 'true' : 'false'); });
+    pinyinEl.textContent = v.pinyin;
+    glyph.setAttribute('aria-label', v.char + '，' + v.pinyin + '，点一下换成英文');
+    hint.textContent = DEFAULT_HINT;
+    start();
+  }
+  window.glyphSeek = function (ms) { stop(); timing(); draw(ms); };
+  window.glyphSelect = function (i) { select(i); };
+  glyph.addEventListener('click', function () {
+    var v = V[cur];
+    english = !english;
+    if (english) {
+      stop();
+      svgs.forEach(function (el) { show(el, false); });
+      enText.textContent = v.english;
+      enText.className = 'en-text' + (v.english.length > 12 ? ' long' : (v.english.length > 6 ? ' mid' : ''));
+      enText.style.color = v.color;
+      show(enText, true);
+      pinyinEl.textContent = '';
+      setLabel('');
+      glyph.setAttribute('aria-label', v.english + '，点一下变回汉字');
+      hint.textContent = '再点一下，变回汉字。';
+    } else {
+      show(enText, false);
+      show(svgs[cur], true);
+      pinyinEl.textContent = v.pinyin;
+      glyph.setAttribute('aria-label', v.char + '，' + v.pinyin + '，点一下换成英文');
+      hint.textContent = DEFAULT_HINT;
+      start();
+    }
+  });
+  swatches.forEach(function (b, k) { b.addEventListener('click', function () { select(k); }); });
+  back.addEventListener('click', function (e) {
+    try { if (document.referrer && window.history.length > 1) { e.preventDefault(); window.history.back(); } } catch (err) {}
+  });
+  select(START_INDEX);
+})();
+</script>
+</body>
+</html>

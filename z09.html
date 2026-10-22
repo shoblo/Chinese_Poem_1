@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>海字</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;500&display=swap">
+<style>
+/* Layout: one narrow column. A picture card, the character drawn stroke by stroke on a loop (tap to see the English word), then a short entry for children. Same ink-on-paper look as the painting page. */
+:root {
+  --ground: #dcdcd9; --paper: #f0f0ee; --square: #ffffff; --edge: #bdbdb9;
+  --ink: #1c1c1c; --ink-soft: #4a4a48; --rule: #c4c4c0; --ghost: #c2c2be;
+  --font-brush: 'Ma Shan Zheng', 'KaiTi', 'STKaiti', 'Kaiti SC', serif;
+  --font-body: 'Noto Serif SC', 'Songti SC', 'SimSun', serif;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+[hidden] { display: none !important; }
+body { background: var(--ground); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.75; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+.page { max-width: 560px; margin: 0 auto; padding-inline: 16px; padding-block: 20px 48px; display: flex; flex-direction: column; gap: 28px; }
+.top { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 16px; }
+.back { color: var(--ink-soft); font-size: 14px; text-decoration: none; border-bottom: 1px solid var(--rule); }
+.back:hover { color: var(--ink); border-bottom-color: var(--ink); }
+.context { margin: 0; font-family: var(--font-brush); font-size: 22px; line-height: 1.4; letter-spacing: 0.15em; color: var(--ink-soft); }
+.context b { font-weight: 400; color: var(--ink); border-bottom: 3px solid var(--ink); }
+.back:focus-visible, .glyph:focus-visible, .pager a:focus-visible { outline: 3px solid var(--ink); outline-offset: 4px; }
+.stage { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.demo { display: flex; align-items: flex-start; justify-content: center; gap: 14px; margin-bottom: 8px; max-width: 100%; }
+.square { width: min(62vw, 260px); aspect-ratio: 1; flex: 0 1 auto; max-width: 100%; background: var(--square); border: 1px solid var(--edge); transition: background-color 0.45s ease; }
+.swatches { display: flex; flex-direction: column; gap: 6px; flex: 0 0 auto; }
+.sw { width: 40px; height: 40px; padding: 0; border-radius: 50%; border: 2px solid var(--ink); background: var(--c); cursor: pointer; }
+.sw[aria-pressed="true"] { outline: 3px solid var(--ink); outline-offset: 3px; }
+.sw:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+.pinyin { margin: 0; font-size: 20px; line-height: 1.4; color: var(--ink-soft); min-height: 1.4em; text-align: center; }
+.square svg { display: block; width: 100%; height: 100%; }
+.glyph { width: 220px; max-width: 100%; height: 190px; padding: 0; background: transparent; color: var(--ink); border: 0; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+.glyph svg { width: 180px; height: 180px; display: block; }
+.live path { stroke-dasharray: 1 2; }
+.en-text { font-family: var(--font-body); font-size: 60px; font-weight: 500; letter-spacing: 0.04em; line-height: 1.15; text-align: center; padding: 0 8px; }
+.en-text.mid { font-size: 42px; }
+.en-text.long { font-size: 32px; }
+.stroke-label { margin: 0; min-height: 1.75em; font-family: var(--font-brush); font-size: 24px; line-height: 1.5; text-align: center; }
+.hint { margin: 0; font-size: 14px; color: var(--ink-soft); min-height: 1.75em; text-align: center; }
+.entry { display: flex; flex-direction: column; gap: 18px; border-top: 1px solid var(--rule); padding-top: 24px; }
+.entry h1 { margin: 0; font-family: var(--font-brush); font-weight: 400; font-size: 32px; line-height: 1.2; }
+.facts { display: grid; grid-template-columns: auto 1fr; gap: 6px 18px; margin: 0; }
+.facts dt { color: var(--ink-soft); font-size: 16px; }
+.facts dd { margin: 0; min-width: 0; font-size: 19px; }
+.entry h2 { margin: 0; font-family: var(--font-brush); font-weight: 400; font-size: 26px; line-height: 1.3; }
+.entry p { margin: 0; max-width: 30em; font-size: 19px; line-height: 1.9; }
+.words { display: flex; flex-wrap: wrap; gap: 10px 12px; margin: 0; padding: 0; list-style: none; }
+.words li { display: inline-flex; align-items: center; gap: 10px; font-family: var(--font-brush); font-size: 26px; line-height: 1.3; padding: 6px 18px 6px 10px; background: var(--square); border: 1px solid var(--ink); border-radius: 2px; }
+.words svg { width: 40px; height: 40px; flex: 0 0 auto; }
+.pager { display: flex; justify-content: space-between; gap: 12px; border-top: 1px solid var(--rule); padding-top: 20px; }
+.pager a { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 6px 18px; color: var(--ink); text-decoration: none; border: 1px solid var(--ink); border-radius: 2px; font-family: var(--font-brush); font-size: 26px; line-height: 1.2; }
+.pager a small { font-family: var(--font-body); font-size: 13px; color: var(--ink-soft); }
+.pager a:hover { background: var(--ink); color: var(--paper); }
+.pager a:hover small { color: var(--paper); }
+</style>
+</head>
+<body>
+<main class="page">
+<div class="top"><a class="back" id="back" href="./">回到画</a><p class="context" aria-label="黄河入海流">黄河入<b>海</b>流</p></div>
+
+<section class="stage" aria-label="海字">
+<div class="demo"><div class="square" id="square" role="img" aria-label="蓝蓝的大海，海上有小船和落日，岸边是沙滩"><svg viewBox='0 0 100 100' fill='none' stroke='#1c1c1c' stroke-width='2.5' stroke-linejoin='round' stroke-linecap='round'><rect width='100' height='100' fill='#f0f0ee' stroke='none'/><circle cx='74' cy='46' r='12' fill='#d6a940'/><path d='M0 46 H100 V84 H0 Z' fill='#7d9bb0'/><path d='M16 20 q4 -4 8 0 q4 -4 8 0 M62 22 q3 -3 6 0 q3 -3 6 0'/><path d='M36 52 V30'/><path d='M37 31 L54 49 H37 Z' fill='#ffffff'/><path d='M24 52 H52 L47 60 H29 Z' fill='#cf4a3c'/><path d='M12 68 q4 -4 8 0 t8 0 M60 66 q4 -4 8 0 t8 0 M40 74 q4 -4 8 0 t8 0' stroke='#ffffff'/><path d='M0 82 C25 76 60 88 100 80 V100 H0 Z' fill='#f3d9b1'/></svg></div></div>
+<button class="glyph" id="glyph" type="button" aria-label="海，点一下换成英文">
+<svg class="gsvg" id="g-main" viewBox="0 0 1024 1024" aria-hidden="true"><defs><clipPath id="maink0"><path d="M 246 711 Q 267 686 289 655 Q 302 639 320 636 Q 333 635 340 649 Q 349 665 343 700 Q 339 730 249 767 Q 233 773 224 771 Q 218 768 218 753 Q 219 740 246 711 Z"/></clipPath><clipPath id="maink1"><path d="M 154 542 Q 191 493 228 471 Q 244 467 255 481 Q 262 494 260 512 Q 254 537 236 553 Q 188 586 150 586 Q 146 587 142 585 Q 135 584 137 570 Q 138 557 154 542 Z"/></clipPath><clipPath id="maink2"><path d="M 123 190 Q 111 186 113 168 Q 131 89 165 72 Q 172 65 183 68 Q 190 69 191 95 Q 197 141 293 399 Q 300 415 299 422 Q 298 432 289 425 Q 273 415 163 232 Q 151 211 123 190 Z"/></clipPath><clipPath id="maink3"><path d="M 520 686 Q 593 788 594 793 Q 593 796 593 798 Q 589 810 563 832 Q 538 848 520 849 Q 502 848 510 827 Q 525 793 458 683 Q 427 632 383 577 Q 373 567 371 561 Q 367 551 381 553 Q 420 559 500 661 L 520 686 Z"/></clipPath><clipPath id="maink4"><path d="M 500 661 Q 548 640 599 650 Q 687 666 778 684 Q 820 694 826 699 Q 836 706 831 716 Q 824 728 794 736 Q 770 742 661 710 Q 579 692 520 686 C 490 683 472 672 500 661 Z"/></clipPath><clipPath id="maink5"><path d="M 754 149 Q 809 139 863 120 Q 884 113 894 115 Q 904 119 898 137 Q 889 156 843 189 Q 825 205 762 196 L 694 195 Q 550 196 422 187 Q 409 186 413 196 Q 449 281 474 343 L 488 379 Q 506 428 517 460 Q 527 497 535 517 Q 538 524 538 529 C 541 538 541 538 521 557 Q 487 594 475 586 Q 468 577 467 568 Q 488 514 443 375 L 430 336 Q 388 227 345 190 Q 338 183 339 169 Q 343 151 360 132 Q 367 122 382 129 Q 419 147 493 154 Q 578 166 685 158 L 754 149 Z"/></clipPath><clipPath id="maink6"><path d="M 685 158 Q 667 80 651 53 Q 641 37 619 45 Q 553 64 557 68 Q 526 80 548 50 Q 582 7 607 -37 Q 629 -68 649 -56 Q 728 -11 754 149 L 762 196 Q 775 311 780 365 L 785 413 Q 794 503 812 525 Q 831 549 819 561 Q 795 583 758 598 Q 740 607 718 599 Q 669 583 631 574 Q 589 564 521 557 C 491 554 508 528 538 529 Q 545 528 551 528 Q 572 528 688 560 Q 709 564 723 556 Q 739 544 726 405 L 722 365 Q 710 262 694 195 L 685 158 Z"/></clipPath><clipPath id="maink7"><path d="M 579 484 Q 595 426 617 415 Q 630 411 641 424 Q 647 436 645 457 Q 635 488 592 507 Q 585 511 580 502 Q 576 495 579 484 Z"/></clipPath><clipPath id="maink8"><path d="M 780 365 Q 859 368 941 362 Q 960 362 966 370 Q 972 380 956 395 Q 896 440 855 424 Q 822 420 785 413 L 726 405 Q 677 401 621 393 Q 557 387 488 379 L 443 375 Q 382 371 317 365 Q 296 364 311 347 Q 324 334 341 327 Q 360 321 377 325 Q 402 331 430 336 L 474 343 Q 568 362 722 365 L 780 365 Z"/></clipPath><clipPath id="maink9"><path d="M 552 292 Q 567 253 590 231 Q 602 225 612 234 Q 619 243 622 256 Q 622 277 611 291 Q 599 306 571 319 Q 559 326 551 326 Q 545 326 545 316 Q 544 306 552 292 Z"/></clipPath></defs><g transform="scale(1,-1) translate(0,-900)"><g fill="#c2c2be"><path d="M 246 711 Q 267 686 289 655 Q 302 639 320 636 Q 333 635 340 649 Q 349 665 343 700 Q 339 730 249 767 Q 233 773 224 771 Q 218 768 218 753 Q 219 740 246 711 Z"/><path d="M 154 542 Q 191 493 228 471 Q 244 467 255 481 Q 262 494 260 512 Q 254 537 236 553 Q 188 586 150 586 Q 146 587 142 585 Q 135 584 137 570 Q 138 557 154 542 Z"/><path d="M 123 190 Q 111 186 113 168 Q 131 89 165 72 Q 172 65 183 68 Q 190 69 191 95 Q 197 141 293 399 Q 300 415 299 422 Q 298 432 289 425 Q 273 415 163 232 Q 151 211 123 190 Z"/><path d="M 520 686 Q 593 788 594 793 Q 593 796 593 798 Q 589 810 563 832 Q 538 848 520 849 Q 502 848 510 827 Q 525 793 458 683 Q 427 632 383 577 Q 373 567 371 561 Q 367 551 381 553 Q 420 559 500 661 L 520 686 Z"/><path d="M 500 661 Q 548 640 599 650 Q 687 666 778 684 Q 820 694 826 699 Q 836 706 831 716 Q 824 728 794 736 Q 770 742 661 710 Q 579 692 520 686 C 490 683 472 672 500 661 Z"/><path d="M 754 149 Q 809 139 863 120 Q 884 113 894 115 Q 904 119 898 137 Q 889 156 843 189 Q 825 205 762 196 L 694 195 Q 550 196 422 187 Q 409 186 413 196 Q 449 281 474 343 L 488 379 Q 506 428 517 460 Q 527 497 535 517 Q 538 524 538 529 C 541 538 541 538 521 557 Q 487 594 475 586 Q 468 577 467 568 Q 488 514 443 375 L 430 336 Q 388 227 345 190 Q 338 183 339 169 Q 343 151 360 132 Q 367 122 382 129 Q 419 147 493 154 Q 578 166 685 158 L 754 149 Z"/><path d="M 685 158 Q 667 80 651 53 Q 641 37 619 45 Q 553 64 557 68 Q 526 80 548 50 Q 582 7 607 -37 Q 629 -68 649 -56 Q 728 -11 754 149 L 762 196 Q 775 311 780 365 L 785 413 Q 794 503 812 525 Q 831 549 819 561 Q 795 583 758 598 Q 740 607 718 599 Q 669 583 631 574 Q 589 564 521 557 C 491 554 508 528 538 529 Q 545 528 551 528 Q 572 528 688 560 Q 709 564 723 556 Q 739 544 726 405 L 722 365 Q 710 262 694 195 L 685 158 Z"/><path d="M 579 484 Q 595 426 617 415 Q 630 411 641 424 Q 647 436 645 457 Q 635 488 592 507 Q 585 511 580 502 Q 576 495 579 484 Z"/><path d="M 780 365 Q 859 368 941 362 Q 960 362 966 370 Q 972 380 956 395 Q 896 440 855 424 Q 822 420 785 413 L 726 405 Q 677 401 621 393 Q 557 387 488 379 L 443 375 Q 382 371 317 365 Q 296 364 311 347 Q 324 334 341 327 Q 360 321 377 325 Q 402 331 430 336 L 474 343 Q 568 362 722 365 L 780 365 Z"/><path d="M 552 292 Q 567 253 590 231 Q 602 225 612 234 Q 619 243 622 256 Q 622 277 611 291 Q 599 306 571 319 Q 559 326 551 326 Q 545 326 545 316 Q 544 306 552 292 Z"/></g><g class="live" id="live-main" fill="none" stroke="#1c1c1c" stroke-width="200" stroke-linecap="round" stroke-linejoin="round"><g clip-path="url(#maink0)"><path pathLength="1" d="M229 762L301 700L321 656"/></g><g clip-path="url(#maink1)"><path pathLength="1" d="M147 575L210 530L235 493"/></g><g clip-path="url(#maink2)"><path pathLength="1" d="M177 78L165 108L161 162L292 418"/></g><g clip-path="url(#maink3)"><path pathLength="1" d="M519 836L542 813L549 793L530 752L463 648L402 578L379 561"/></g><g clip-path="url(#maink4)"><path pathLength="1" d="M508 661L530 670L632 679L754 707L820 710"/></g><g clip-path="url(#maink5)"><path pathLength="1" d="M480 577L505 524L492 462L449 331L385 194L384 171L416 164L592 179L775 172L824 164L888 126"/></g><g clip-path="url(#maink6)"><path pathLength="1" d="M531 556L548 544L559 545L715 580L743 575L772 543L735 230L710 107L683 34L668 14L642 -4L548 61"/></g><g clip-path="url(#maink7)"><path pathLength="1" d="M590 495L620 450L623 432"/></g><g clip-path="url(#maink8)"><path pathLength="1" d="M314 356L368 346L631 379L883 397L955 376"/></g><g clip-path="url(#maink9)"><path pathLength="1" d="M554 317L589 277L599 247"/></g></g></g></svg>
+<span class="en-text" id="en" hidden>sea</span>
+</button>
+<p class="pinyin" id="pinyin" lang="zh-Latn">hǎi</p>
+<p class="stroke-label" id="label" aria-hidden="true" hidden></p>
+<p class="hint" id="hint"></p>
+</section>
+
+<article class="entry">
+
+
+
+
+<section>
+<h2>海的好朋友</h2>
+<ul class="words">
+<li>
+<svg aria-hidden="true" viewBox='0 0 48 48' fill='none' stroke='currentColor' stroke-width='2' stroke-linejoin='round' stroke-linecap='round'><path d='M4 14 q5 -7 10 0 t10 0 t10 0 t10 0 V24 H4 Z' fill='#7d9bb0'/><path d='M4 28 q5 -7 10 0 t10 0 t10 0 t10 0 V42 H4 Z' fill='#7d9bb0'/></svg>
+大海</li>
+<li>
+<svg aria-hidden="true" viewBox='0 0 48 48' fill='none' stroke='currentColor' stroke-width='2' stroke-linejoin='round' stroke-linecap='round'><path d='M24 12 V40' stroke='#5a4a3a'/><path d='M5 24 C7 8 41 8 43 24 Z' fill='#cf4a3c'/><path d='M24 11 L17 24 M24 11 L31 24'/><path d='M3 43 C13 35 35 35 45 43 Z' fill='#f3d9b1'/></svg>
+海边</li>
+<li>
+<svg aria-hidden="true" viewBox='0 0 48 48' fill='none' stroke='currentColor' stroke-width='2' stroke-linejoin='round' stroke-linecap='round'><path d='M24.0 6.0 L29.0 18.1 L42.1 19.1 L32.1 27.6 L35.2 40.4 L24.0 33.5 L12.8 40.4 L15.9 27.6 L5.9 19.1 L19.0 18.1 Z' fill='#c9654a'/><circle cx='24' cy='25' r='1.6' fill='#d6a940' stroke='none'/><circle cx='24' cy='14' r='1.3' fill='#d6a940' stroke='none'/><circle cx='35' cy='22' r='1.3' fill='#d6a940' stroke='none'/><circle cx='13' cy='22' r='1.3' fill='#d6a940' stroke='none'/><circle cx='18' cy='35' r='1.3' fill='#d6a940' stroke='none'/><circle cx='30' cy='35' r='1.3' fill='#d6a940' stroke='none'/></svg>
+海星</li>
+<li>
+<svg aria-hidden="true" viewBox='0 0 48 48' fill='none' stroke='currentColor' stroke-width='2' stroke-linejoin='round' stroke-linecap='round'><path d='M26 14 L30 5 L34 15 Z' fill='#7d9bb0'/><path d='M4 28 C10 26 12 18 20 14 C30 10 40 18 42 31 L47 26 L47 40 L38 38 C34 38 26 40 20 36 C14 32 10 32 4 28 Z' fill='#7d9bb0'/><circle cx='16' cy='23' r='1.4' fill='currentColor' stroke='none'/><path d='M22 38 L28 44 L32 38'/></svg>
+海豚</li>
+</ul>
+</section>
+</article>
+
+<nav class="pager" aria-label="翻页"><a href="z08.html" aria-label="上一个字：入">←<span>入</span></a><a href="z10.html" aria-label="下一个字：流"><span>流</span>→</a></nav>
+</main>
+
+<script>
+(function () {
+  var V = [{"key":"main","char":"海","pinyin":"hǎi","english":"sea","color":"#1c1c1c","bg":null,"names":["点","点","提","撇","横","竖折","横折钩","点","横","点"]}];
+  var START_INDEX = 0;
+  var glyph = document.getElementById('glyph');
+  var enText = document.getElementById('en');
+  var label = document.getElementById('label');
+  var hint = document.getElementById('hint');
+  var pinyinEl = document.getElementById('pinyin');
+  var square = document.getElementById('square');
+  var back = document.getElementById('back');
+  var swatches = Array.prototype.slice.call(document.querySelectorAll('.sw'));
+  var svgs = V.map(function (v) { return document.getElementById('g-' + v.key); });
+  var lives = V.map(function (v) { return document.getElementById('live-' + v.key); });
+  var strokesOf = lives.map(function (l) { return Array.prototype.slice.call(l.querySelectorAll('path')); });
+  var numerals = ['一','二','三','四','五','六','七','八','九','十','十一','十二','十三','十四','十五'];
+  var reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  var DEFAULT_HINT = "";
+  var cur = START_INDEX, english = false, t0 = 0, raf = 0, lastLabel = '';
+  var count = 0, START = 400, DUR = 900, STEP = 1200, HOLD = 1500, FADE = 600, FADE_AT = 0, CYCLE = 0;
+  function timing() {
+    count = strokesOf[cur].length;
+    DUR = count <= 6 ? 900 : 750;
+    STEP = count <= 6 ? 1200 : 1000;
+    FADE_AT = START + (count - 1) * STEP + DUR + HOLD;
+    CYCLE = FADE_AT + FADE;
+  }
+  function show(el, on) { if (on) el.removeAttribute('hidden'); else el.setAttribute('hidden', ''); }
+  function setLabel(text) { if (text !== lastLabel) { label.textContent = text; lastLabel = text; } }
+  function ease(p) { return p * p * (3 - 2 * p); }
+  function draw(t) {
+    var v = V[cur], strokes = strokesOf[cur], i, p, started = -1, done = 0;
+    for (i = 0; i < count; i++) {
+      p = (t - (START + i * STEP)) / DUR;
+      p = p < 0 ? 0 : (p > 1 ? 1 : p);
+      if (p > 0) started = i;
+      if (p >= 1) done++;
+      strokes[i].style.strokeDashoffset = String(1 - ease(p));
+      strokes[i].style.opacity = p > 0 ? '1' : '0';
+    }
+    lives[cur].style.opacity = t > FADE_AT ? String(Math.max(0, 1 - (t - FADE_AT) / FADE)) : '1';
+    if (started < 0) setLabel('看一看，' + v.char + '是怎么写的');
+    else if (done === count) setLabel('写好啦，一共 ' + count + ' 笔');
+    else setLabel('第' + numerals[started] + '笔' + (v.names[started] ? '：' + v.names[started] : ''));
+  }
+  function drawAll() {
+    var v = V[cur], strokes = strokesOf[cur], i;
+    for (i = 0; i < count; i++) { strokes[i].style.strokeDashoffset = '0'; strokes[i].style.opacity = '1'; }
+    lives[cur].style.opacity = '1';
+    setLabel(v.names.every(function (x) { return x; }) ? '笔顺：' + v.names.join('、') : '一共 ' + count + ' 笔');
+  }
+  function tick(now) { draw((now - t0) % CYCLE); raf = window.requestAnimationFrame(tick); }
+  function stop() { if (raf) { window.cancelAnimationFrame(raf); raf = 0; } }
+  function start() {
+    stop();
+    lastLabel = null;
+    timing();
+    if (reduce) { drawAll(); return; }
+    t0 = performance.now();
+    raf = window.requestAnimationFrame(tick);
+  }
+  function select(i) {
+    var v = V[i];
+    cur = i; english = false;
+    svgs.forEach(function (el, k) { show(el, k === i); });
+    show(enText, false);
+    if (square && v.bg) square.style.backgroundColor = v.bg;
+    swatches.forEach(function (b, k) { b.setAttribute('aria-pressed', k === i ? 'true' : 'false'); });
+    pinyinEl.textContent = v.pinyin;
+    glyph.setAttribute('aria-label', v.char + '，' + v.pinyin + '，点一下换成英文');
+    hint.textContent = DEFAULT_HINT;
+    start();
+  }
+  window.glyphSeek = function (ms) { stop(); timing(); draw(ms); };
+  window.glyphSelect = function (i) { select(i); };
+  glyph.addEventListener('click', function () {
+    var v = V[cur];
+    english = !english;
+    if (english) {
+      stop();
+      svgs.forEach(function (el) { show(el, false); });
+      enText.textContent = v.english;
+      enText.className = 'en-text' + (v.english.length > 12 ? ' long' : (v.english.length > 6 ? ' mid' : ''));
+      enText.style.color = v.color;
+      show(enText, true);
+      pinyinEl.textContent = '';
+      setLabel('');
+      glyph.setAttribute('aria-label', v.english + '，点一下变回汉字');
+      hint.textContent = '再点一下，变回汉字。';
+    } else {
+      show(enText, false);
+      show(svgs[cur], true);
+      pinyinEl.textContent = v.pinyin;
+      glyph.setAttribute('aria-label', v.char + '，' + v.pinyin + '，点一下换成英文');
+      hint.textContent = DEFAULT_HINT;
+      start();
+    }
+  });
+  swatches.forEach(function (b, k) { b.addEventListener('click', function () { select(k); }); });
+  back.addEventListener('click', function (e) {
+    try { if (document.referrer && window.history.length > 1) { e.preventDefault(); window.history.back(); } } catch (err) {}
+  });
+  select(START_INDEX);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>楼字</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;500&display=swap">
+<style>
+/* Layout: one narrow column. A picture card, the character drawn stroke by stroke on a loop (tap to see the English word), then a short entry for children. Same ink-on-paper look as the painting page. */
+:root {
+  --ground: #dcdcd9; --paper: #f0f0ee; --square: #ffffff; --edge: #bdbdb9;
+  --ink: #1c1c1c; --ink-soft: #4a4a48; --rule: #c4c4c0; --ghost: #c2c2be;
+  --font-brush: 'Ma Shan Zheng', 'KaiTi', 'STKaiti', 'Kaiti SC', serif;
+  --font-body: 'Noto Serif SC', 'Songti SC', 'SimSun', serif;
+  color-scheme: light;
+}
+* { box-sizing: border-box; }
+html, body { margin: 0; }
+[hidden] { display: none !important; }
+body { background: var(--ground); color: var(--ink); font-family: var(--font-body); font-size: 16px; line-height: 1.75; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+.page { max-width: 560px; margin: 0 auto; padding-inline: 16px; padding-block: 20px 48px; display: flex; flex-direction: column; gap: 28px; }
+.top { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 16px; }
+.back { color: var(--ink-soft); font-size: 14px; text-decoration: none; border-bottom: 1px solid var(--rule); }
+.back:hover { color: var(--ink); border-bottom-color: var(--ink); }
+.context { margin: 0; font-family: var(--font-brush); font-size: 22px; line-height: 1.4; letter-spacing: 0.15em; color: var(--ink-soft); }
+.context b { font-weight: 400; color: var(--ink); border-bottom: 3px solid var(--ink); }
+.back:focus-visible, .glyph:focus-visible, .pager a:focus-visible { outline: 3px solid var(--ink); outline-offset: 4px; }
+.stage { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.demo { display: flex; align-items: flex-start; justify-content: center; gap: 14px; margin-bottom: 8px; max-width: 100%; }
+.square { width: min(62vw, 260px); aspect-ratio: 1; flex: 0 1 auto; max-width: 100%; background: var(--square); border: 1px solid var(--edge); transition: background-color 0.45s ease; }
+.swatches { display: flex; flex-direction: column; gap: 6px; flex: 0 0 auto; }
+.sw { width: 40px; height: 40px; padding: 0; border-radius: 50%; border: 2px solid var(--ink); background: var(--c); cursor: pointer; }
+.sw[aria-pressed="true"] { outline: 3px solid var(--ink); outline-offset: 3px; }
+.sw:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+.pinyin { margin: 0; font-size: 20px; line-height: 1.4; color: var(--ink-soft); min-height: 1.4em; text-align: center; }
+.square svg { display: block; width: 100%; height: 100%; }
+.glyph { width: 220px; max-width: 100%; height: 190px; padding: 0; background: transparent; color: var(--ink); border: 0; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; }
+.glyph svg { width: 180px; height: 180px; display: block; }
+.live path { stroke-dasharray: 1 2; }
+.en-text { font-family: var(--font-body); font-size: 60px; font-weight: 500; letter-spacing: 0.04em; line-height: 1.15; text-align: center; padding: 0 8px; }
+.en-text.mid { font-size: 42px; }
+.en-text.long { font-size: 32px; }
+.stroke-label { margin: 0; min-height: 1.75em; font-family: var(--font-brush); font-size: 24px; line-height: 1.5; text-align: center; }
+.hint { margin: 0; font-size: 14px; color: var(--ink-soft); min-height: 1.75em; text-align: center; }
+.entry { display: flex; flex-direction: column; gap: 18px; border-top: 1px solid var(--rule); padding-top: 24px; }
+.entry h1 { margin: 0; font-family: var(--font-brush); font-weight: 400; font-size: 32px; line-height: 1.2; }
+.facts { display: grid; grid-template-columns: auto 1fr; gap: 6px 18px; margin: 0; }
+.facts dt { color: var(--ink-soft); font-size: 16px; }
+.facts dd { margin: 0; min-width: 0; font-size: 19px; }
+.entry h2 { margin: 0; font-family: var(--font-brush); font-weight: 400; font-size: 26px; line-height: 1.3; }
+.entry p { margin: 0; max-width: 30em; font-size: 19px; line-height: 1.9; }
+.words { display: flex; flex-wrap: wrap; gap: 10px 12px; margin: 0; padding: 0; list-style: none; }
+.words li { display: inline-flex; align-items: center; gap: 10px; font-family: var(--font-brush); font-size: 26px; line-height: 1.3; padding: 6px 18px 6px 10px; background: var(--square); border: 1px solid var(--ink); border-radius: 2px; }
+.words svg { width: 40px; height: 40px; flex: 0 0 auto; }
+.pager { display: flex; justify-content: space-between; gap: 12px; border-top: 1px solid var(--rule); padding-top: 20px; }
+.pager a { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; padding: 6px 18px; color: var(--ink); text-decoration: none; border: 1px solid var(--ink); border-radius: 2px; font-family: var(--font-brush); font-size: 26px; line-height: 1.2; }
+.pager a small { font-family: var(--font-body); font-size: 13px; color: var(--ink-soft); }
+.pager a:hover { background: var(--ink); color: var(--paper); }
+.pager a:hover small { color: var(--paper); }
+</style>
+</head>
+<body>
+<main class="page">
+<div class="top"><a class="back" id="back" href="./">回到画</a><p class="context" aria-label="更上一层楼">更上一层<b>楼</b></p></div>
+
+<section class="stage" aria-label="楼字">
+<div class="demo"><div class="square" id="square" role="img" aria-label="一座有三层飞檐的高塔，背后是青山和河水"><svg viewBox='0 0 100 100' fill='none' stroke='#1c1c1c' stroke-width='2.5' stroke-linejoin='round' stroke-linecap='round'><rect x='0' y='0' width='100' height='100' fill='#f0f0ee' stroke='none'/><path d='M0 74 Q22 46 46 66 Q74 44 100 70 V100 H0 Z' fill='#5d6a42'/><path d='M0 92 Q25 87 50 92 T100 92 V100 H0 Z' fill='#7d9bb0'/><path d='M22 86 H78 V91 H22 Z' fill='#9c9c9a'/><rect x='32' y='75' width='36' height='11' fill='#f3d9b1'/><rect x='45' y='77' width='10' height='9' fill='#5a4a3a'/><path d='M38 75 V86 M62 75 V86' stroke='#5a4a3a' stroke-width='3'/><rect x='37' y='52' width='26' height='10' fill='#f3d9b1'/><path d='M40 52 V62 M60 52 V62' stroke='#5a4a3a' stroke-width='3'/><rect x='41' y='29' width='18' height='10' fill='#f3d9b1'/><path d='M44 29 V39 M56 29 V39' stroke='#5a4a3a' stroke-width='3'/><path d='M16 66 Q26 75 36 75 H64 Q74 75 84 66 Q70 67 64 62 H36 Q30 67 16 66 Z' fill='#c9654a'/><path d='M22 43 Q31 52 39 52 H61 Q69 52 78 43 Q67 44 62 39 H38 Q33 44 22 43 Z' fill='#c9654a'/><path d='M28 21 Q35 29 42 29 H58 Q65 29 72 21 Q63 22 59 17 H41 Q37 22 28 21 Z' fill='#c9654a'/><path d='M50 17 V10' stroke='#d6a940' stroke-width='3'/><circle cx='50' cy='8' r='3' fill='#d6a940'/></svg></div></div>
+<button class="glyph" id="glyph" type="button" aria-label="楼，点一下换成英文">
+<svg class="gsvg" id="g-main" viewBox="0 0 1024 1024" aria-hidden="true"><defs><clipPath id="maink0"><path d="M 330 523 Q 343 527 361 531 Q 398 541 404 547 Q 413 556 408 564 Q 401 576 370 582 Q 351 586 332 580 L 285 564 Q 183 533 108 522 Q 71 515 99 499 Q 144 475 199 492 Q 230 499 264 507 L 330 523 Z"/></clipPath><clipPath id="maink1"><path d="M 326 421 Q 327 470 330 523 L 332 580 Q 333 671 353 731 Q 363 747 360 760 Q 353 770 298 806 Q 274 822 253 808 Q 249 804 254 787 Q 285 739 285 692 Q 285 632 285 564 L 279 419 Q 267 191 265 184 Q 258 147 247 109 Q 235 67 260 7 Q 266 -11 274 -15 Q 280 -22 288 -13 Q 315 5 317 68 Q 316 108 325 387 L 326 421 Z"/></clipPath><clipPath id="maink2"><path d="M 264 507 Q 240 437 205 372 Q 165 300 70 169 Q 64 159 76 158 Q 97 158 198 284 Q 241 339 279 419 C 335 536 274 535 264 507 Z"/></clipPath><clipPath id="maink3"><path d="M 325 387 Q 326 386 330 383 Q 358 358 386 326 Q 396 316 408 315 Q 417 315 421 325 Q 425 335 421 359 Q 415 389 329 421 Q 328 422 326 421 C 296 425 302 406 325 387 Z"/></clipPath><clipPath id="maink4"><path d="M 483 683 Q 526 628 546 626 Q 559 625 565 641 Q 566 653 558 672 Q 549 685 530 692 Q 500 705 488 707 Q 479 708 478 699 Q 477 692 483 683 Z"/></clipPath><clipPath id="maink5"><path d="M 746 737 Q 728 710 692 668 Q 686 661 691 655 Q 698 654 705 657 Q 775 700 811 716 Q 827 720 823 730 Q 819 745 802 762 Q 786 778 766 781 Q 753 781 753 764 Q 754 751 746 737 Z"/></clipPath><clipPath id="maink6"><path d="M 660 558 Q 693 567 823 584 Q 833 583 841 595 Q 842 605 820 616 Q 793 637 693 607 Q 675 603 657 598 Q 653 597 650 596 L 615 588 Q 572 581 534 575 Q 494 571 448 563 Q 420 559 442 543 Q 472 522 514 529 Q 541 535 576 542 L 660 558 Z"/></clipPath><clipPath id="maink7"><path d="M 650 596 Q 653 729 681 785 Q 687 794 676 806 Q 654 824 628 835 Q 612 842 598 837 Q 585 833 591 819 Q 618 776 615 708 Q 616 641 615 588 L 612 520 Q 603 427 606 416 Q 612 406 617 394 Q 627 379 641 387 Q 650 394 651 455 Q 650 485 649 536 L 650 596 Z"/></clipPath><clipPath id="maink8"><path d="M 576 542 Q 555 482 441 398 Q 428 388 440 386 Q 449 385 479 399 Q 507 409 534 431 Q 556 450 583 479 Q 599 501 612 520 C 635 554 595 591 576 542 Z"/></clipPath><clipPath id="maink9"><path d="M 649 536 Q 695 473 749 415 Q 768 396 800 394 Q 858 390 919 400 Q 935 401 936 406 Q 939 412 926 417 Q 784 466 722 509 Q 704 521 689 534 Q 673 549 660 558 C 636 576 631 560 649 536 Z"/></clipPath><clipPath id="maink10"><path d="M 656 87 Q 704 51 771 -12 Q 793 -34 810 -34 Q 829 -35 832 -16 Q 833 3 809 48 Q 797 75 685 127 L 641 147 Q 604 165 575 174 Q 551 180 565 202 Q 578 235 590 257 L 606 291 Q 607 292 608 294 Q 615 316 626 332 Q 635 339 631 348 Q 627 361 589 386 Q 579 393 569 390 Q 557 386 564 372 Q 573 351 555 285 L 544 250 Q 511 175 513 171 Q 516 161 531 158 Q 570 145 611 118 Q 612 118 613 116 L 656 87 Z"/></clipPath><clipPath id="maink11"><path d="M 613 116 Q 553 56 408 24 Q 392 17 411 13 Q 552 -8 654 84 Q 654 87 656 87 L 685 127 Q 715 169 733 219 Q 745 256 755 270 C 770 296 768 297 742 312 Q 709 333 687 327 Q 674 324 680 309 Q 681 306 683 302 L 686 267 Q 687 243 673 211 Q 660 175 641 147 L 613 116 Z"/></clipPath><clipPath id="maink12"><path d="M 755 270 Q 789 273 912 273 Q 930 273 935 281 Q 939 291 925 303 Q 874 342 814 325 Q 781 319 742 312 L 683 302 Q 650 301 606 291 L 555 285 Q 474 275 383 264 Q 364 263 378 247 Q 391 234 407 229 Q 426 225 440 229 Q 489 242 544 250 L 590 257 Q 614 264 686 267 L 755 270 Z"/></clipPath></defs><g transform="scale(1,-1) translate(0,-900)"><g fill="#c2c2be"><path d="M 330 523 Q 343 527 361 531 Q 398 541 404 547 Q 413 556 408 564 Q 401 576 370 582 Q 351 586 332 580 L 285 564 Q 183 533 108 522 Q 71 515 99 499 Q 144 475 199 492 Q 230 499 264 507 L 330 523 Z"/><path d="M 326 421 Q 327 470 330 523 L 332 580 Q 333 671 353 731 Q 363 747 360 760 Q 353 770 298 806 Q 274 822 253 808 Q 249 804 254 787 Q 285 739 285 692 Q 285 632 285 564 L 279 419 Q 267 191 265 184 Q 258 147 247 109 Q 235 67 260 7 Q 266 -11 274 -15 Q 280 -22 288 -13 Q 315 5 317 68 Q 316 108 325 387 L 326 421 Z"/><path d="M 264 507 Q 240 437 205 372 Q 165 300 70 169 Q 64 159 76 158 Q 97 158 198 284 Q 241 339 279 419 C 335 536 274 535 264 507 Z"/><path d="M 325 387 Q 326 386 330 383 Q 358 358 386 326 Q 396 316 408 315 Q 417 315 421 325 Q 425 335 421 359 Q 415 389 329 421 Q 328 422 326 421 C 296 425 302 406 325 387 Z"/><path d="M 483 683 Q 526 628 546 626 Q 559 625 565 641 Q 566 653 558 672 Q 549 685 530 692 Q 500 705 488 707 Q 479 708 478 699 Q 477 692 483 683 Z"/><path d="M 746 737 Q 728 710 692 668 Q 686 661 691 655 Q 698 654 705 657 Q 775 700 811 716 Q 827 720 823 730 Q 819 745 802 762 Q 786 778 766 781 Q 753 781 753 764 Q 754 751 746 737 Z"/><path d="M 660 558 Q 693 567 823 584 Q 833 583 841 595 Q 842 605 820 616 Q 793 637 693 607 Q 675 603 657 598 Q 653 597 650 596 L 615 588 Q 572 581 534 575 Q 494 571 448 563 Q 420 559 442 543 Q 472 522 514 529 Q 541 535 576 542 L 660 558 Z"/><path d="M 650 596 Q 653 729 681 785 Q 687 794 676 806 Q 654 824 628 835 Q 612 842 598 837 Q 585 833 591 819 Q 618 776 615 708 Q 616 641 615 588 L 612 520 Q 603 427 606 416 Q 612 406 617 394 Q 627 379 641 387 Q 650 394 651 455 Q 650 485 649 536 L 650 596 Z"/><path d="M 576 542 Q 555 482 441 398 Q 428 388 440 386 Q 449 385 479 399 Q 507 409 534 431 Q 556 450 583 479 Q 599 501 612 520 C 635 554 595 591 576 542 Z"/><path d="M 649 536 Q 695 473 749 415 Q 768 396 800 394 Q 858 390 919 400 Q 935 401 936 406 Q 939 412 926 417 Q 784 466 722 509 Q 704 521 689 534 Q 673 549 660 558 C 636 576 631 560 649 536 Z"/><path d="M 656 87 Q 704 51 771 -12 Q 793 -34 810 -34 Q 829 -35 832 -16 Q 833 3 809 48 Q 797 75 685 127 L 641 147 Q 604 165 575 174 Q 551 180 565 202 Q 578 235 590 257 L 606 291 Q 607 292 608 294 Q 615 316 626 332 Q 635 339 631 348 Q 627 361 589 386 Q 579 393 569 390 Q 557 386 564 372 Q 573 351 555 285 L 544 250 Q 511 175 513 171 Q 516 161 531 158 Q 570 145 611 118 Q 612 118 613 116 L 656 87 Z"/><path d="M 613 116 Q 553 56 408 24 Q 392 17 411 13 Q 552 -8 654 84 Q 654 87 656 87 L 685 127 Q 715 169 733 219 Q 745 256 755 270 C 770 296 768 297 742 312 Q 709 333 687 327 Q 674 324 680 309 Q 681 306 683 302 L 686 267 Q 687 243 673 211 Q 660 175 641 147 L 613 116 Z"/><path d="M 755 270 Q 789 273 912 273 Q 930 273 935 281 Q 939 291 925 303 Q 874 342 814 325 Q 781 319 742 312 L 683 302 Q 650 301 606 291 L 555 285 Q 474 275 383 264 Q 364 263 378 247 Q 391 234 407 229 Q 426 225 440 229 Q 489 242 544 250 L 590 257 Q 614 264 686 267 L 755 270 Z"/></g><g class="live" id="live-main" fill="none" stroke="#1c1c1c" stroke-width="200" stroke-linecap="round" stroke-linejoin="round"><g clip-path="url(#maink0)"><path pathLength="1" d="M100 512L148 506L344 555L397 558"/></g><g clip-path="url(#maink1)"><path pathLength="1" d="M264 801L293 777L316 746L295 230L280 87L279 -2"/></g><g clip-path="url(#maink2)"><path pathLength="1" d="M280 504L270 497L258 428L226 363L160 262L77 165"/></g><g clip-path="url(#maink3)"><path pathLength="1" d="M328 415L339 412L344 395L396 354L408 329"/></g><g clip-path="url(#maink4)"><path pathLength="1" d="M488 696L526 669L547 643"/></g><g clip-path="url(#maink5)"><path pathLength="1" d="M766 767L781 737L697 661"/></g><g clip-path="url(#maink6)"><path pathLength="1" d="M443 554L467 548L516 551L752 599L801 602L831 596"/></g><g clip-path="url(#maink7)"><path pathLength="1" d="M600 826L624 810L643 782L628 506L633 396"/></g><g clip-path="url(#maink8)"><path pathLength="1" d="M608 542L528 447L482 412L471 410L467 402L444 392"/></g><g clip-path="url(#maink9)"><path pathLength="1" d="M656 551L696 504L776 438L836 420L929 410"/></g><g clip-path="url(#maink10)"><path pathLength="1" d="M572 380L587 365L597 342L538 180L720 76L772 36L813 -15"/></g><g clip-path="url(#maink11)"><path pathLength="1" d="M689 316L702 308L718 282L711 236L684 170L631 97L594 69L541 43L470 23L419 21"/></g><g clip-path="url(#maink12)"><path pathLength="1" d="M380 256L416 247L649 283L850 302L925 286"/></g></g></g></svg>
+<span class="en-text" id="en" hidden>building</span>
+</button>
+<p class="pinyin" id="pinyin" lang="zh-Latn">lóu</p>
+<p class="stroke-label" id="label" aria-hidden="true" hidden></p>
+<p class="hint" id="hint"></p>
+</section>
+
+<article class="entry">
+
+
+
+
+<section>
+<h2>楼的好朋友</h2>
+<ul class="words">
+<li>
+<svg aria-hidden="true" viewBox='0 0 48 48' fill='none' stroke='currentColor' stroke-width='2' stroke-linejoin='round' stroke-linecap='round'><rect x='9' y='17' width='30' height='26' fill='#f3d9b1'/><path d='M5 18 L24 5 L43 18 Z' fill='#cf4a3c'/><rect x='13' y='21' width='7' height='6' fill='#ffffff'/><rect x='28' y='21' width='7' height='6' fill='#ffffff'/><rect x='13' y='31' width='7' height='6' fill='#ffffff'/><rect x='28' y='33' width='7' height='10' fill='#5a4a3a'/></svg>
+楼房</li>
+<li>
+<svg aria-hidden="true" viewBox='0 0 48 48' fill='none' stroke='currentColor' stroke-width='2' stroke-linejoin='round' stroke-linecap='round'><rect x='5' y='28' width='10' height='15' fill='#cfcfcc'/><rect x='33' y='22' width='10' height='21' fill='#cfcfcc'/><rect x='15' y='8' width='18' height='35' fill='#7d9bb0'/><path d='M24 8 V2'/><path d='M20 15 H28 M20 22 H28 M20 29 H28'/><path d='M3 43 H45'/></svg>
+高楼</li>
+<li>
+<svg aria-hidden="true" viewBox='0 0 48 48' fill='none' stroke='currentColor' stroke-width='2' stroke-linejoin='round' stroke-linecap='round'><path d='M6 42 V34 H14 V26 H22 V18 H30 V10 H42 V42 Z' fill='#f3d9b1'/><path d='M8 24 L30 6'/><path d='M14 19 V26'/><path d='M22 13 V18'/></svg>
+楼梯</li>
+<li>
+<svg aria-hidden="true" viewBox='0 0 48 48' fill='none' stroke='currentColor' stroke-width='2' stroke-linejoin='round' stroke-linecap='round'><rect x='5' y='15' width='38' height='28' fill='#cfcfcc'/><path d='M24 15 V3'/><path d='M24 3 H34 L31 6 L34 9 H24 Z' fill='#cf4a3c'/><rect x='9' y='20' width='6' height='5' fill='#ffffff'/><rect x='21' y='20' width='6' height='5' fill='#ffffff'/><rect x='33' y='20' width='6' height='5' fill='#ffffff'/><rect x='9' y='28' width='6' height='5' fill='#ffffff'/><rect x='33' y='28' width='6' height='5' fill='#ffffff'/><rect x='20' y='32' width='8' height='11' fill='#5a4a3a'/></svg>
+大楼</li>
+</ul>
+</section>
+</article>
+
+<nav class="pager" aria-label="翻页"><a href="z19.html" aria-label="上一个字：层">←<span>层</span></a><a href="./" aria-label="回到画"><small>回到画</small>→</a></nav>
+</main>
+
+<script>
+(function () {
+  var V = [{"key":"main","char":"楼","pinyin":"lóu","english":"building","color":"#1c1c1c","bg":null,"names":["横","竖","撇","点","点","撇","横","竖","撇","点","撇点","撇","横"]}];
+  var START_INDEX = 0;
+  var glyph = document.getElementById('glyph');
+  var enText = document.getElementById('en');
+  var label = document.getElementById('label');
+  var hint = document.getElementById('hint');
+  var pinyinEl = document.getElementById('pinyin');
+  var square = document.getElementById('square');
+  var back = document.getElementById('back');
+  var swatches = Array.prototype.slice.call(document.querySelectorAll('.sw'));
+  var svgs = V.map(function (v) { return document.getElementById('g-' + v.key); });
+  var lives = V.map(function (v) { return document.getElementById('live-' + v.key); });
+  var strokesOf = lives.map(function (l) { return Array.prototype.slice.call(l.querySelectorAll('path')); });
+  var numerals = ['一','二','三','四','五','六','七','八','九','十','十一','十二','十三','十四','十五'];
+  var reduce = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+  var DEFAULT_HINT = "";
+  var cur = START_INDEX, english = false, t0 = 0, raf = 0, lastLabel = '';
+  var count = 0, START = 400, DUR = 900, STEP = 1200, HOLD = 1500, FADE = 600, FADE_AT = 0, CYCLE = 0;
+  function timing() {
+    count = strokesOf[cur].length;
+    DUR = count <= 6 ? 900 : 750;
+    STEP = count <= 6 ? 1200 : 1000;
+    FADE_AT = START + (count - 1) * STEP + DUR + HOLD;
+    CYCLE = FADE_AT + FADE;
+  }
+  function show(el, on) { if (on) el.removeAttribute('hidden'); else el.setAttribute('hidden', ''); }
+  function setLabel(text) { if (text !== lastLabel) { label.textContent = text; lastLabel = text; } }
+  function ease(p) { return p * p * (3 - 2 * p); }
+  function draw(t) {
+    var v = V[cur], strokes = strokesOf[cur], i, p, started = -1, done = 0;
+    for (i = 0; i < count; i++) {
+      p = (t - (START + i * STEP)) / DUR;
+      p = p < 0 ? 0 : (p > 1 ? 1 : p);
+      if (p > 0) started = i;
+      if (p >= 1) done++;
+      strokes[i].style.strokeDashoffset = String(1 - ease(p));
+      strokes[i].style.opacity = p > 0 ? '1' : '0';
+    }
+    lives[cur].style.opacity = t > FADE_AT ? String(Math.max(0, 1 - (t - FADE_AT) / FADE)) : '1';
+    if (started < 0) setLabel('看一看，' + v.char + '是怎么写的');
+    else if (done === count) setLabel('写好啦，一共 ' + count + ' 笔');
+    else setLabel('第' + numerals[started] + '笔' + (v.names[started] ? '：' + v.names[started] : ''));
+  }
+  function drawAll() {
+    var v = V[cur], strokes = strokesOf[cur], i;
+    for (i = 0; i < count; i++) { strokes[i].style.strokeDashoffset = '0'; strokes[i].style.opacity = '1'; }
+    lives[cur].style.opacity = '1';
+    setLabel(v.names.every(function (x) { return x; }) ? '笔顺：' + v.names.join('、') : '一共 ' + count + ' 笔');
+  }
+  function tick(now) { draw((now - t0) % CYCLE); raf = window.requestAnimationFrame(tick); }
+  function stop() { if (raf) { window.cancelAnimationFrame(raf); raf = 0; } }
+  function start() {
+    stop();
+    lastLabel = null;
+    timing();
+    if (reduce) { drawAll(); return; }
+    t0 = performance.now();
+    raf = window.requestAnimationFrame(tick);
+  }
+  function select(i) {
+    var v = V[i];
+    cur = i; english = false;
+    svgs.forEach(function (el, k) { show(el, k === i); });
+    show(enText, false);
+    if (square && v.bg) square.style.backgroundColor = v.bg;
+    swatches.forEach(function (b, k) { b.setAttribute('aria-pressed', k === i ? 'true' : 'false'); });
+    pinyinEl.textContent = v.pinyin;
+    glyph.setAttribute('aria-label', v.char + '，' + v.pinyin + '，点一下换成英文');
+    hint.textContent = DEFAULT_HINT;
+    start();
+  }
+  window.glyphSeek = function (ms) { stop(); timing(); draw(ms); };
+  window.glyphSelect = function (i) { select(i); };
+  glyph.addEventListener('click', function () {
+    var v = V[cur];
+    english = !english;
+    if (english) {
+      stop();
+      svgs.forEach(function (el) { show(el, false); });
+      enText.textContent = v.english;
+      enText.className = 'en-text' + (v.english.length > 12 ? ' long' : (v.english.length > 6 ? ' mid' : ''));
+      enText.style.color = v.color;
+      show(enText, true);
+      pinyinEl.textContent = '';
+      setLabel('');
+      glyph.setAttribute('aria-label', v.english + '，点一下变回汉字');
+      hint.textContent = '再点一下，变回汉字。';
+    } else {
+      show(enText, false);
+      show(svgs[cur], true);
+      pinyinEl.textContent = v.pinyin;
+      glyph.setAttribute('aria-label', v.char + '，' + v.pinyin + '，点一下换成英文');
+      hint.textContent = DEFAULT_HINT;
+      start();
+    }
+  });
+  swatches.forEach(function (b, k) { b.addEventListener('click', function () { select(k); }); });
+  back.addEventListener('click', function (e) {
+    try { if (document.referrer && window.history.length > 1) { e.preventDefault(); window.history.back(); } } catch (err) {}
+  });
+  select(START_INDEX);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>登鹳雀楼</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;500&display=swap">
+<style>
+/* Layout: one hanging scroll-style painting, a caption and seal-style button beneath it. Single committed ink-on-paper look; colour is added in four stages as the verses appear. */
+:root {
+  --paper: #f0f0ee;
+  --ground: #dcdcd9;
+  --ink: #1c1c1c;
+  --ink-soft: #4a4a48;
+  --seal: #2e2e2e;
+  --font-brush: 'Ma Shan Zheng', 'KaiTi', 'STKaiti', 'Kaiti SC', serif;
+  --font-body: 'Noto Serif SC', 'Songti SC', 'SimSun', serif;
+  color-scheme: light;
+}
+body {
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.7;
+}
+.page {
+  max-width: 760px;
+  margin: 0 auto;
+  padding-inline: 16px;
+  padding-block: 24px 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+#scene { display: block; width: 100%; height: auto; max-width: 100%; }
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px 24px;
+}
+.caption { flex: 1 1 240px; min-width: 0; }
+.caption .verse { font-family: var(--font-brush); font-size: 30px; line-height: 1.3; margin: 0; }
+.caption .gloss { margin: 4px 0 0; color: var(--ink-soft); font-size: 15px; min-height: 1.7em; }
+.start {
+  font-family: var(--font-brush);
+  font-size: 24px;
+  letter-spacing: 0.25em;
+  padding: 10px 26px 10px calc(26px + 0.25em);
+  background: var(--seal);
+  color: var(--paper);
+  border: 0;
+  border-radius: 2px;
+  cursor: pointer;
+  flex: 0 0 auto;
+}
+.start:hover:not(:disabled) { background: #000; }
+.start:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+.start:disabled { opacity: 0.55; cursor: default; }
+.note { margin: 0; font-size: 13px; color: var(--ink-soft); }
+.chars { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 8px 16px; }
+.char-lines { display: flex; flex-direction: column; gap: 8px; }
+.char-line { display: flex; gap: 8px; }
+.chars-label { font-size: 13px; color: var(--ink-soft); padding-top: 14px; }
+.char {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 46px;
+  height: 46px;
+  font-family: var(--font-brush);
+  font-size: 30px;
+  line-height: 1;
+  color: var(--ink);
+  text-decoration: none;
+  border: 1px solid var(--ink);
+  border-radius: 2px;
+}
+.char:hover { background: var(--ink); color: var(--paper); }
+.char:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+
+.poem { font-family: var(--font-brush); fill: #1c1c1c; text-anchor: middle; }
+.poem text { transition: opacity 0.9s ease; }
+[data-s] { transition: fill 2s ease, stroke 2s ease; }
+#sun { transition: transform 4.2s ease-out; }
+#figure { transition: transform 3.4s ease-in-out; }
+.flow { opacity: 0; transition: opacity 1.2s ease, stroke 2s ease; }
+.flowing .flow { opacity: 0.9; animation: flow 1.6s linear infinite; }
+.flowing .flow.slow { animation-duration: 2.4s; }
+@keyframes flow { to { stroke-dashoffset: 30; } }
+.running #birds { animation: drift 9s ease-in-out infinite alternate; }
+.running #cloudsA { animation: cloud 18s ease-in-out infinite alternate; }
+.running #cloudsB { animation: cloud 24s ease-in-out infinite alternate-reverse; }
+@keyframes drift { from { transform: translate(0, 0); } to { transform: translate(150px, -14px); } }
+@keyframes cloud { from { transform: translateX(0); } to { transform: translateX(36px); } }
+@media (prefers-reduced-motion: reduce) {
+  #sun, #figure, .poem text, .flow, [data-s] { transition: none; }
+  .running #birds, .running #cloudsA, .running #cloudsB, .flowing .flow { animation: none; }
+}
+</style>
+
+<style>body{margin:0}[hidden]{display:none!important}</style>
+</head>
+<body>
+<main class="page">
+<svg id="scene" viewBox="0 0 680 480" role="img" xmlns="http://www.w3.org/2000/svg">
+<title>登鹳雀楼</title>
+<desc>黑白水墨风景：落日靠着远山，黄河流向天边，一座高楼上有人影远望，左上角竖排题着王之涣的《登鹳雀楼》。随着诗句出现，画面分四段由黑白变成彩色。</desc>
+<rect x="0" y="0" width="680" height="480" fill="#f0f0ee"/>
+<rect data-s="3" data-fill="#f3d9b1" x="0" y="0" width="680" height="260" fill="#e4e4e2"/>
+<rect data-s="3" data-fill="#f0c996" x="0" y="150" width="680" height="110" fill="#d8d8d6"/>
+<g id="sun">
+<circle data-s="1" data-fill="#eeb98a" cx="470" cy="215" r="62" fill="#cfcfcd"/>
+<circle data-s="1" data-fill="#cf4a3c" cx="470" cy="215" r="46" fill="#3a3a3a"/>
+</g>
+<g id="cloudsA">
+<ellipse data-s="3" data-fill="#f8ebd0" cx="170" cy="100" rx="60" ry="9" fill="#f5f5f3"/>
+<ellipse data-s="3" data-fill="#f8ebd0" cx="205" cy="90" rx="38" ry="7" fill="#f5f5f3"/>
+</g>
+<g id="cloudsB">
+<ellipse data-s="3" data-fill="#f8ebd0" cx="560" cy="120" rx="52" ry="8" fill="#f5f5f3"/>
+<ellipse data-s="3" data-fill="#f8ebd0" cx="520" cy="110" rx="30" ry="6" fill="#f5f5f3"/>
+</g>
+<path data-s="1" data-fill="#9a8a82" d="M280 250 L340 222 L400 238 L520 236 L580 205 L640 228 L680 220 L680 252 Z" fill="#9c9c9a"/>
+<path data-s="1" data-fill="#5d5654" d="M330 262 L400 240 L470 252 L540 234 L610 248 L680 238 L680 272 L330 272 Z" fill="#4e4e4e"/>
+<rect data-s="2" data-fill="#d8c79c" x="0" y="250" width="680" height="230" fill="#cfcfcc"/>
+<rect data-s="2" data-fill="#f6e6c4" x="0" y="244" width="680" height="14" fill="#f0f0ee" opacity="0.6"/>
+<path data-s="2" data-fill="#d6a940" d="M0 256 L170 256 C260 262 330 275 380 300 C430 330 470 360 520 400 C540 420 560 440 580 480 L330 480 C340 450 330 420 290 395 C240 365 150 330 90 310 C50 298 20 290 0 288 Z" fill="#ececea"/>
+<path data-s="2" data-stroke="#f0d88a" d="M20 266 C90 268 160 270 230 282" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round"/>
+<path data-s="2" data-stroke="#f0d88a" d="M260 300 C320 318 380 345 430 385" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round"/>
+<path data-s="2" data-stroke="#b98a2c" d="M300 330 C340 350 400 390 440 430" fill="none" stroke="#8a8a88" stroke-width="1.5" stroke-linecap="round"/>
+<path data-s="2" data-stroke="#b98a2c" d="M120 288 C180 296 230 312 270 340" fill="none" stroke="#8a8a88" stroke-width="1.5" stroke-linecap="round"/>
+<path class="flow" data-s="2" data-stroke="#f6e7ae" d="M10 272 C100 282 210 300 270 330 C340 362 400 392 420 420 C435 440 445 460 450 480" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="12 18"/>
+<path class="flow slow" data-s="2" data-stroke="#b98a2c" transform="translate(40 0)" d="M10 272 C100 282 210 300 270 330 C340 362 400 392 420 420 C435 440 445 460 450 480" fill="none" stroke="#8a8a88" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="8 22"/>
+<path data-s="4" data-fill="#6e6a4a" d="M0 480 L0 400 C40 380 120 380 200 420 C240 440 280 460 300 480 Z" fill="#5a5a58"/>
+<rect data-s="4" data-fill="#5a4a3a" x="60" y="396" width="100" height="14" fill="#3a3a3a"/>
+<rect data-s="4" data-fill="#a8452f" x="72" y="350" width="76" height="46" fill="#7a7a78"/>
+<rect data-s="4" data-fill="#4a2a20" x="84" y="362" width="12" height="34" fill="#262626"/>
+<rect data-s="4" data-fill="#4a2a20" x="104" y="362" width="12" height="34" fill="#262626"/>
+<rect data-s="4" data-fill="#4a2a20" x="124" y="362" width="12" height="34" fill="#262626"/>
+<polygon data-s="4" data-fill="#3d3a3a" points="55,350 165,350 148,334 72,334" fill="#2a2a2a"/>
+<rect data-s="4" data-fill="#b84a33" x="80" y="308" width="60" height="26" fill="#858583"/>
+<rect data-s="4" data-fill="#4a2a20" x="92" y="316" width="10" height="18" fill="#262626"/>
+<rect data-s="4" data-fill="#4a2a20" x="118" y="316" width="10" height="18" fill="#262626"/>
+<polygon data-s="4" data-fill="#3d3a3a" points="64,308 156,308 138,294 82,294" fill="#2a2a2a"/>
+<rect data-s="4" data-fill="#c9654a" x="90" y="268" width="40" height="26" fill="#a0a09e"/>
+<polygon data-s="4" data-fill="#3d3a3a" points="76,268 144,268 128,254 92,254" fill="#2a2a2a"/>
+<rect data-s="4" data-fill="#3d3a3a" x="108" y="238" width="4" height="16" fill="#2a2a2a"/>
+<rect data-s="4" data-fill="#3d3a3a" x="105" y="236" width="10" height="4" fill="#2a2a2a"/>
+<g id="figure" style="transform: translateY(0px)">
+<circle data-s="4" data-fill="#2b2522" cx="110" cy="277" r="3.5" fill="#1c1c1c" stroke="#f0f0ee" stroke-width="0.8"/>
+<polygon data-s="4" data-fill="#2b2522" points="104,282 116,282 118,294 102,294" fill="#1c1c1c" stroke="#f0f0ee" stroke-width="0.8"/>
+</g>
+<rect data-s="4" data-fill="#3b2f26" x="228" y="418" width="4" height="22" fill="#222222"/>
+<ellipse data-s="4" data-fill="#4f5a3a" cx="230" cy="408" rx="20" ry="16" fill="#3c3c3c"/>
+<rect data-s="4" data-fill="#3b2f26" x="258" y="432" width="3" height="18" fill="#222222"/>
+<ellipse data-s="4" data-fill="#5d6a42" cx="259" cy="424" rx="14" ry="12" fill="#4a4a4a"/>
+<g id="birds">
+<path data-s="3" data-stroke="#5d5654" d="M240 130 q8 -8 16 0 q8 -8 16 0" fill="none" stroke="#3a3a3a" stroke-width="1.5" stroke-linecap="round"/>
+<path data-s="3" data-stroke="#5d5654" d="M300 150 q6 -6 12 0 q6 -6 12 0" fill="none" stroke="#3a3a3a" stroke-width="1.5" stroke-linecap="round"/>
+<path data-s="3" data-stroke="#5d5654" d="M340 118 q5 -5 10 0 q5 -5 10 0" fill="none" stroke="#3a3a3a" stroke-width="1.5" stroke-linecap="round"/>
+</g>
+<g class="poem">
+<text font-size="19"><tspan x="92" y="46">登</tspan><tspan x="92" y="68">鹳</tspan><tspan x="92" y="90">雀</tspan><tspan x="92" y="112">楼</tspan></text>
+<text font-size="12"><tspan x="92" y="146">唐</tspan><tspan x="92" y="161">王</tspan><tspan x="92" y="176">之</tspan><tspan x="92" y="191">涣</tspan></text>
+<text id="v1" font-size="17"><tspan x="62" y="46">白</tspan><tspan x="62" y="65">日</tspan><tspan x="62" y="84">依</tspan><tspan x="62" y="103">山</tspan><tspan x="62" y="122">尽</tspan></text>
+<text id="v2" font-size="17"><tspan x="62" y="151">黄</tspan><tspan x="62" y="170">河</tspan><tspan x="62" y="189">入</tspan><tspan x="62" y="208">海</tspan><tspan x="62" y="227">流</tspan></text>
+<text id="v3" font-size="17"><tspan x="32" y="46">欲</tspan><tspan x="32" y="65">穷</tspan><tspan x="32" y="84">千</tspan><tspan x="32" y="103">里</tspan><tspan x="32" y="122">目</tspan></text>
+<text id="v4" font-size="17"><tspan x="32" y="151">更</tspan><tspan x="32" y="170">上</tspan><tspan x="32" y="189">一</tspan><tspan x="32" y="208">层</tspan><tspan x="32" y="227">楼</tspan></text>
+</g>
+<rect data-s="4" data-fill="#b3342a" x="612" y="424" width="28" height="28" fill="#2e2e2e"/>
+<rect x="618" y="430" width="16" height="16" fill="none" stroke="#f0f0ee" stroke-width="1.5"/>
+<rect data-s="4" data-stroke="#5a4a3a" x="6" y="6" width="668" height="468" fill="none" stroke="#3a3a3a" stroke-width="1"/>
+</svg>
+
+<div class="controls">
+<div class="caption" aria-live="polite">
+<p class="verse" id="verse">登鹳雀楼</p>
+<p class="gloss" id="gloss"></p>
+</div>
+<button class="start" id="start" type="button">开始</button>
+</div>
+<nav class="chars" aria-label="逐字解释">
+<div class="char-lines">
+<div class="char-line"><a class="char" href="z01.html" aria-label="白字的解释">白</a><a class="char" href="z02.html" aria-label="日字的解释">日</a><a class="char" href="z03.html" aria-label="依字的解释">依</a><a class="char" href="z04.html" aria-label="山字的解释">山</a><a class="char" href="z05.html" aria-label="尽字的解释">尽</a></div>
+<div class="char-line"><a class="char" href="z06.html" aria-label="黄字的解释">黄</a><a class="char" href="z07.html" aria-label="河字的解释">河</a><a class="char" href="z08.html" aria-label="入字的解释">入</a><a class="char" href="z09.html" aria-label="海字的解释">海</a><a class="char" href="z10.html" aria-label="流字的解释">流</a></div>
+<div class="char-line"><a class="char" href="z11.html" aria-label="欲字的解释">欲</a><a class="char" href="z12.html" aria-label="穷字的解释">穷</a><a class="char" href="z13.html" aria-label="千字的解释">千</a><a class="char" href="z14.html" aria-label="里字的解释">里</a><a class="char" href="z15.html" aria-label="目字的解释">目</a></div>
+<div class="char-line"><a class="char" href="z16.html" aria-label="更字的解释">更</a><a class="char" href="z17.html" aria-label="上字的解释">上</a><a class="char" href="z18.html" aria-label="一字的解释">一</a><a class="char" href="z19.html" aria-label="层字的解释">层</a><a class="char" href="z20.html" aria-label="楼字的解释">楼</a></div>
+</div>
+</nav>
+</main>
+
+<script>
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var scene = $('scene'), sun = $('sun'), figure = $('figure');
+  var btn = $('start'), verseEl = $('verse'), glossEl = $('gloss');
+  var tinted = scene.querySelectorAll('[data-s]');
+  var verses = [
+    { line: '白日依山尽', gloss: '太阳靠着西边的山，慢慢沉下去。' },
+    { line: '黄河入海流', gloss: '黄河奔腾向东，流向远方的大海。' },
+    { line: '欲穷千里目', gloss: '想把千里之外的景色都看个够。' },
+    { line: '更上一层楼', gloss: '那就再登上一层楼。' }
+  ];
+  var running = false;
+
+  function colorize(n) {
+    var els = scene.querySelectorAll('[data-s="' + n + '"]');
+    for (var i = 0; i < els.length; i++) {
+      var el = els[i];
+      if (el.getAttribute('data-fill')) el.style.fill = el.getAttribute('data-fill');
+      if (el.getAttribute('data-stroke')) el.style.stroke = el.getAttribute('data-stroke');
+    }
+  }
+
+  function light(n) {
+    $('v' + n).style.opacity = 1;
+    verseEl.textContent = verses[n - 1].line;
+    glossEl.textContent = verses[n - 1].gloss;
+    colorize(n);
+  }
+
+  function reset() {
+    var i;
+    sun.style.transition = 'none';
+    figure.style.transition = 'none';
+    for (i = 0; i < tinted.length; i++) {
+      tinted[i].style.transition = 'none';
+      tinted[i].style.fill = '';
+      tinted[i].style.stroke = '';
+    }
+    sun.style.transform = 'translateY(-50px)';
+    figure.style.transform = 'translateY(102px)';
+    for (i = 1; i <= 4; i++) $('v' + i).style.opacity = 0.15;
+    scene.classList.remove('flowing');
+    void scene.getBoundingClientRect();
+    sun.style.transition = '';
+    figure.style.transition = '';
+    for (i = 0; i < tinted.length; i++) tinted[i].style.transition = '';
+  }
+
+  function play() {
+    if (running) return;
+    running = true;
+    btn.disabled = true;
+    btn.textContent = '进行中';
+    verseEl.textContent = '登鹳雀楼';
+    glossEl.textContent = '';
+    reset();
+    scene.classList.add('running');
+
+    setTimeout(function () {
+      light(1);
+      sun.style.transform = 'translateY(0px)';
+    }, 400);
+    setTimeout(function () {
+      light(2);
+      scene.classList.add('flowing');
+    }, 6800);
+    setTimeout(function () {
+      light(3);
+      figure.style.transform = 'translateY(40px)';
+    }, 13200);
+    setTimeout(function () {
+      light(4);
+      figure.style.transform = 'translateY(0px)';
+    }, 19600);
+    setTimeout(function () {
+      glossEl.textContent = '站得高，才看得远。';
+      running = false;
+      btn.disabled = false;
+      btn.textContent = '重看';
+    }, 24000);
+  }
+
+  btn.addEventListener('click', play);
+})();
+</script>
+
+</body>
+</html>
