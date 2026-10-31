@@ -1,8 +1,4 @@
-<!doctype html>
-<html lang="zh-CN">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
 <title>登鹳雀楼</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -39,28 +35,68 @@ body {
 .controls {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  gap: 16px 24px;
+  gap: 20px 24px;
 }
 .caption { flex: 1 1 240px; min-width: 0; }
-.caption .verse { font-family: var(--font-brush); font-size: 30px; line-height: 1.3; margin: 0; }
-.caption .gloss { margin: 4px 0 0; color: var(--ink-soft); font-size: 15px; min-height: 1.7em; }
-.start {
+.caption .title { font-family: var(--font-brush); font-size: 30px; font-weight: 400; line-height: 1.3; margin: 0 0 6px; }
+.lines { display: flex; flex-direction: column; gap: 2px; margin: 0; padding: 0; list-style: none; }
+.line {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  align-self: flex-start;
+  padding: 2px 0;
+  background: none;
+  border: 0;
   font-family: var(--font-brush);
-  font-size: 24px;
-  letter-spacing: 0.25em;
-  padding: 10px 26px 10px calc(26px + 0.25em);
+  font-size: 30px;
+  line-height: 1.35;
+  letter-spacing: 0.08em;
+  color: var(--ink-soft);
+  cursor: pointer;
+  text-align: left;
+  transition: color 0.6s ease;
+}
+.line::before {
+  content: '';
+  width: 12px;
+  height: 12px;
+  flex: 0 0 auto;
+  border: 1.5px solid var(--ink);
+  background: transparent;
+  transition: background-color 0.6s ease;
+}
+.line.done { color: var(--ink); }
+.line.done::before { background: var(--ink); }
+.line:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+.caption .gloss { margin: 8px 0 0; color: var(--ink-soft); font-size: 15px; min-height: 1.7em; }
+.voice { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; flex: 0 0 auto; max-width: 100%; }
+.mic {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-brush);
+  font-size: 26px;
+  letter-spacing: 0.15em;
+  padding: 12px 26px 12px 22px;
   background: var(--seal);
   color: var(--paper);
   border: 0;
   border-radius: 2px;
   cursor: pointer;
-  flex: 0 0 auto;
 }
-.start:hover:not(:disabled) { background: #000; }
-.start:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
-.start:disabled { opacity: 0.55; cursor: default; }
+.mic svg { width: 26px; height: 26px; flex: 0 0 auto; }
+.mic:hover { background: #000; }
+.mic:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+.mic.on { background: #b3342a; animation: pulse 1.6s ease-out infinite; }
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(179, 52, 42, 0.45); }
+  100% { box-shadow: 0 0 0 16px rgba(179, 52, 42, 0); }
+}
+.status { margin: 0; max-width: 17em; min-height: 1.7em; font-size: 14px; color: var(--ink-soft); }
+.heard { margin: 0; max-width: 17em; min-height: 1.4em; font-size: 13px; color: var(--ink-soft); opacity: 0.8; }
 .note { margin: 0; font-size: 13px; color: var(--ink-soft); }
 .chars { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 8px 16px; }
 .char-lines { display: flex; flex-direction: column; gap: 8px; }
@@ -98,14 +134,12 @@ body {
 @keyframes drift { from { transform: translate(0, 0); } to { transform: translate(150px, -14px); } }
 @keyframes cloud { from { transform: translateX(0); } to { transform: translateX(36px); } }
 @media (prefers-reduced-motion: reduce) {
-  #sun, #figure, .poem text, .flow, [data-s] { transition: none; }
+  .mic.on { animation: none; }
+  #sun, #figure, .poem text, .flow, [data-s], .line, .line::before { transition: none; }
   .running #birds, .running #cloudsA, .running #cloudsB, .flowing .flow { animation: none; }
 }
 </style>
 
-<style>body{margin:0}[hidden]{display:none!important}</style>
-</head>
-<body>
 <main class="page">
 <svg id="scene" viewBox="0 0 680 480" role="img" xmlns="http://www.w3.org/2000/svg">
 <title>登鹳雀楼</title>
@@ -113,7 +147,7 @@ body {
 <rect x="0" y="0" width="680" height="480" fill="#f0f0ee"/>
 <rect data-s="3" data-fill="#f3d9b1" x="0" y="0" width="680" height="260" fill="#e4e4e2"/>
 <rect data-s="3" data-fill="#f0c996" x="0" y="150" width="680" height="110" fill="#d8d8d6"/>
-<g id="sun">
+<g id="sun" style="transform: translateY(-50px)">
 <circle data-s="1" data-fill="#eeb98a" cx="470" cy="215" r="62" fill="#cfcfcd"/>
 <circle data-s="1" data-fill="#cf4a3c" cx="470" cy="215" r="46" fill="#3a3a3a"/>
 </g>
@@ -151,7 +185,7 @@ body {
 <polygon data-s="4" data-fill="#3d3a3a" points="76,268 144,268 128,254 92,254" fill="#2a2a2a"/>
 <rect data-s="4" data-fill="#3d3a3a" x="108" y="238" width="4" height="16" fill="#2a2a2a"/>
 <rect data-s="4" data-fill="#3d3a3a" x="105" y="236" width="10" height="4" fill="#2a2a2a"/>
-<g id="figure" style="transform: translateY(0px)">
+<g id="figure" style="transform: translateY(102px)">
 <circle data-s="4" data-fill="#2b2522" cx="110" cy="277" r="3.5" fill="#1c1c1c" stroke="#f0f0ee" stroke-width="0.8"/>
 <polygon data-s="4" data-fill="#2b2522" points="104,282 116,282 118,294 102,294" fill="#1c1c1c" stroke="#f0f0ee" stroke-width="0.8"/>
 </g>
@@ -167,10 +201,10 @@ body {
 <g class="poem">
 <text font-size="19"><tspan x="92" y="46">登</tspan><tspan x="92" y="68">鹳</tspan><tspan x="92" y="90">雀</tspan><tspan x="92" y="112">楼</tspan></text>
 <text font-size="12"><tspan x="92" y="146">唐</tspan><tspan x="92" y="161">王</tspan><tspan x="92" y="176">之</tspan><tspan x="92" y="191">涣</tspan></text>
-<text id="v1" font-size="17"><tspan x="62" y="46">白</tspan><tspan x="62" y="65">日</tspan><tspan x="62" y="84">依</tspan><tspan x="62" y="103">山</tspan><tspan x="62" y="122">尽</tspan></text>
-<text id="v2" font-size="17"><tspan x="62" y="151">黄</tspan><tspan x="62" y="170">河</tspan><tspan x="62" y="189">入</tspan><tspan x="62" y="208">海</tspan><tspan x="62" y="227">流</tspan></text>
-<text id="v3" font-size="17"><tspan x="32" y="46">欲</tspan><tspan x="32" y="65">穷</tspan><tspan x="32" y="84">千</tspan><tspan x="32" y="103">里</tspan><tspan x="32" y="122">目</tspan></text>
-<text id="v4" font-size="17"><tspan x="32" y="151">更</tspan><tspan x="32" y="170">上</tspan><tspan x="32" y="189">一</tspan><tspan x="32" y="208">层</tspan><tspan x="32" y="227">楼</tspan></text>
+<text id="v1" font-size="17" style="opacity:0.15"><tspan x="62" y="46">白</tspan><tspan x="62" y="65">日</tspan><tspan x="62" y="84">依</tspan><tspan x="62" y="103">山</tspan><tspan x="62" y="122">尽</tspan></text>
+<text id="v2" font-size="17" style="opacity:0.15"><tspan x="62" y="151">黄</tspan><tspan x="62" y="170">河</tspan><tspan x="62" y="189">入</tspan><tspan x="62" y="208">海</tspan><tspan x="62" y="227">流</tspan></text>
+<text id="v3" font-size="17" style="opacity:0.15"><tspan x="32" y="46">欲</tspan><tspan x="32" y="65">穷</tspan><tspan x="32" y="84">千</tspan><tspan x="32" y="103">里</tspan><tspan x="32" y="122">目</tspan></text>
+<text id="v4" font-size="17" style="opacity:0.15"><tspan x="32" y="151">更</tspan><tspan x="32" y="170">上</tspan><tspan x="32" y="189">一</tspan><tspan x="32" y="208">层</tspan><tspan x="32" y="227">楼</tspan></text>
 </g>
 <rect data-s="4" data-fill="#b3342a" x="612" y="424" width="28" height="28" fill="#2e2e2e"/>
 <rect x="618" y="430" width="16" height="16" fill="none" stroke="#f0f0ee" stroke-width="1.5"/>
@@ -178,11 +212,21 @@ body {
 </svg>
 
 <div class="controls">
-<div class="caption" aria-live="polite">
-<p class="verse" id="verse">登鹳雀楼</p>
-<p class="gloss" id="gloss"></p>
+<div class="caption">
+<h1 class="title">登鹳雀楼</h1>
+<ul class="lines" aria-label="诗句">
+<li><button class="line" type="button" data-i="0">白日依山尽</button></li>
+<li><button class="line" type="button" data-i="1">黄河入海流</button></li>
+<li><button class="line" type="button" data-i="2">欲穷千里目</button></li>
+<li><button class="line" type="button" data-i="3">更上一层楼</button></li>
+</ul>
+<p class="gloss" id="gloss" aria-live="polite"></p>
 </div>
-<button class="start" id="start" type="button">开始</button>
+<div class="voice">
+<button class="mic" id="mic" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg><span id="micLabel">开始读</span></button>
+<p class="status" id="status" aria-live="polite"></p>
+<p class="heard" id="heard" aria-hidden="true"></p>
+</div>
 </div>
 <nav class="chars" aria-label="逐字解释">
 <div class="char-lines">
@@ -198,15 +242,64 @@ body {
 (function () {
   var $ = function (id) { return document.getElementById(id); };
   var scene = $('scene'), sun = $('sun'), figure = $('figure');
-  var btn = $('start'), verseEl = $('verse'), glossEl = $('gloss');
+  var micBtn = $('mic'), micLabel = $('micLabel'), statusEl = $('status'), heardEl = $('heard'), glossEl = $('gloss');
+  var lineBtns = Array.prototype.slice.call(document.querySelectorAll('.line'));
   var tinted = scene.querySelectorAll('[data-s]');
-  var verses = [
-    { line: '白日依山尽', gloss: '太阳靠着西边的山，慢慢沉下去。' },
-    { line: '黄河入海流', gloss: '黄河奔腾向东，流向远方的大海。' },
-    { line: '欲穷千里目', gloss: '想把千里之外的景色都看个够。' },
-    { line: '更上一层楼', gloss: '那就再登上一层楼。' }
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  var LINES = ['白日依山尽', '黄河入海流', '欲穷千里目', '更上一层楼'];
+  var GLOSS = [
+    '太阳靠着西边的山，慢慢沉下去。',
+    '黄河奔腾向东，流向远方的大海。',
+    '想把千里之外的景色都看个够。',
+    '那就再登上一层楼。'
   ];
-  var running = false;
+  var FINAL = '站得高，才看得远。';
+  var NEED = 3;
+  var done = [false, false, false, false];
+  var listening = false, want = false, fatal = false, rec = null, restartTimer = 0, revealTimers = [];
+
+  /* Characters that sound alike are treated as the same, because speech recognition often
+     writes a different character for a child's voice. The first character of each group is the one kept. */
+  var GROUPS = ['白百柏摆拜', '日', '依一衣医伊', '山闪善扇杉', '尽进近紧金今劲仅', '黄皇煌凰',
+    '河和合何', '入如', '海还害', '流留刘', '欲预遇育玉', '穷琼', '千前钱牵', '里理李力',
+    '目木母幕慕', '更耕跟根', '上尚商', '层曾', '楼漏搂'];
+  var CANON = {};
+  GROUPS.forEach(function (g) { for (var i = 0; i < g.length; i++) CANON[g.charAt(i)] = g.charAt(0); });
+
+  function canon(text) {
+    var out = [], i, c;
+    for (i = 0; i < text.length; i++) {
+      c = text.charAt(i);
+      if (c >= '一' && c <= '鿿') out.push(CANON[c] || c);
+    }
+    return out;
+  }
+  function lcs(a, b) {
+    var prev = [], cur, i, j;
+    for (j = 0; j <= b.length; j++) prev.push(0);
+    for (i = 1; i <= a.length; i++) {
+      cur = [0];
+      for (j = 1; j <= b.length; j++) {
+        cur.push(a[i - 1] === b[j - 1] ? prev[j - 1] + 1 : Math.max(prev[j], cur[j - 1]));
+      }
+      prev = cur;
+    }
+    return prev[b.length];
+  }
+  var LINE_CANON = LINES.map(canon);
+
+  function findLines(texts) {
+    var found = [], i, t, k, tail;
+    for (i = 0; i < 4; i++) {
+      if (done[i]) continue;
+      for (k = 0; k < texts.length; k++) {
+        tail = canon(texts[k]).slice(-60);
+        if (lcs(LINE_CANON[i], tail) >= NEED) { found.push(i); break; }
+      }
+    }
+    return found;
+  }
 
   function colorize(n) {
     var els = scene.querySelectorAll('[data-s="' + n + '"]');
@@ -217,15 +310,41 @@ body {
     }
   }
 
-  function light(n) {
-    $('v' + n).style.opacity = 1;
-    verseEl.textContent = verses[n - 1].line;
-    glossEl.textContent = verses[n - 1].gloss;
-    colorize(n);
+  function allDone() { return done.every(function (d) { return d; }); }
+
+  function setStatus(text) { statusEl.textContent = text; }
+
+  function setListening(on) {
+    listening = on;
+    micBtn.classList.toggle('on', on);
+    micBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    micLabel.textContent = on ? '我在听' : (allDone() ? '再读一遍' : '开始读');
+    if (!on) heardEl.textContent = '';
   }
 
-  function reset() {
+  function reveal(i) {
+    if (done[i]) return;
+    done[i] = true;
+    scene.classList.add('running');
+    lineBtns[i].classList.add('done');
+    $('v' + (i + 1)).style.opacity = 1;
+    glossEl.textContent = GLOSS[i];
+    colorize(i + 1);
+    if (i === 0) sun.style.transform = 'translateY(0px)';
+    if (i === 1) scene.classList.add('flowing');
+    if (i === 2 && !done[3]) figure.style.transform = 'translateY(40px)';
+    if (i === 3) figure.style.transform = 'translateY(0px)';
+    if (allDone()) {
+      glossEl.textContent = FINAL;
+      stopListening();
+      setStatus('');
+    }
+  }
+
+  function resetAll() {
     var i;
+    revealTimers.forEach(function (t) { clearTimeout(t); });
+    revealTimers = [];
     sun.style.transition = 'none';
     figure.style.transition = 'none';
     for (i = 0; i < tinted.length; i++) {
@@ -237,49 +356,109 @@ body {
     figure.style.transform = 'translateY(102px)';
     for (i = 1; i <= 4; i++) $('v' + i).style.opacity = 0.15;
     scene.classList.remove('flowing');
+    scene.classList.remove('running');
     void scene.getBoundingClientRect();
     sun.style.transition = '';
     figure.style.transition = '';
     for (i = 0; i < tinted.length; i++) tinted[i].style.transition = '';
-  }
-
-  function play() {
-    if (running) return;
-    running = true;
-    btn.disabled = true;
-    btn.textContent = '进行中';
-    verseEl.textContent = '登鹳雀楼';
+    done = [false, false, false, false];
+    lineBtns.forEach(function (b) { b.classList.remove('done'); });
     glossEl.textContent = '';
-    reset();
-    scene.classList.add('running');
-
-    setTimeout(function () {
-      light(1);
-      sun.style.transform = 'translateY(0px)';
-    }, 400);
-    setTimeout(function () {
-      light(2);
-      scene.classList.add('flowing');
-    }, 6800);
-    setTimeout(function () {
-      light(3);
-      figure.style.transform = 'translateY(40px)';
-    }, 13200);
-    setTimeout(function () {
-      light(4);
-      figure.style.transform = 'translateY(0px)';
-    }, 19600);
-    setTimeout(function () {
-      glossEl.textContent = '站得高，才看得远。';
-      running = false;
-      btn.disabled = false;
-      btn.textContent = '重看';
-    }, 24000);
+    heardEl.textContent = '';
   }
 
-  btn.addEventListener('click', play);
+  /* ----- listening ----- */
+  function handleResult(e) {
+    var results = Array.prototype.slice.call(e.results), texts = [], i, j, primary, first = e.resultIndex || 0;
+    primary = results.map(function (r) { return r[0] ? r[0].transcript : ''; }).join('');
+    texts.push(primary);
+    for (i = first; i < results.length; i++) {
+      for (j = 1; j < results[i].length; j++) texts.push(results[i][j].transcript);
+    }
+    var shown = primary.replace(/[^一-鿿]/g, '').slice(-12);
+    heardEl.textContent = shown ? '听到：' + shown : '';
+    var found = findLines(texts);
+    found.forEach(function (idx, k) {
+      var t = setTimeout(function () { reveal(idx); }, k * 900);
+      revealTimers.push(t);
+    });
+  }
+
+  function handleError(e) {
+    var code = e && e.error;
+    if (code === 'not-allowed' || code === 'service-not-allowed') {
+      fatal = true;
+      setStatus('需要允许使用麦克风。允许后，再点一次“开始读”。也可以直接点一句诗。');
+    } else if (code === 'audio-capture') {
+      fatal = true;
+      setStatus('没有找到麦克风。也可以直接点一句诗。');
+    } else if (code === 'network') {
+      fatal = true;
+      setStatus('没有连上网。听声音需要联网。也可以直接点一句诗。');
+    } else if (code === 'language-not-supported') {
+      fatal = true;
+      setStatus('这个浏览器听不懂中文。也可以直接点一句诗。');
+    }
+  }
+
+  function startRecognition() {
+    if (!want || fatal) return;
+    try {
+      rec = new SR();
+      rec.lang = 'zh-CN';
+      rec.continuous = true;
+      rec.interimResults = true;
+      rec.maxAlternatives = 3;
+      rec.onresult = handleResult;
+      rec.onerror = handleError;
+      rec.onend = function () {
+        if (want && !fatal) {
+          clearTimeout(restartTimer);
+          restartTimer = setTimeout(startRecognition, 250);
+        } else {
+          setListening(false);
+        }
+      };
+      rec.start();
+    } catch (err) {
+      clearTimeout(restartTimer);
+      if (want && !fatal) restartTimer = setTimeout(startRecognition, 400);
+    }
+  }
+
+  function startListening() {
+    if (!SR) {
+      setStatus('这里听不到声音。请用 Chrome 或 Safari 打开，或者直接点一句诗。');
+      return;
+    }
+    fatal = false;
+    want = true;
+    setStatus('');
+    setListening(true);
+    startRecognition();
+  }
+
+  function stopListening() {
+    want = false;
+    clearTimeout(restartTimer);
+    if (rec) { try { rec.onend = null; rec.stop(); } catch (err) {} }
+    rec = null;
+    setListening(false);
+  }
+
+  micBtn.addEventListener('click', function () {
+    if (listening) { stopListening(); setStatus(''); return; }
+    if (allDone()) resetAll();
+    startListening();
+  });
+
+  lineBtns.forEach(function (b, i) {
+    b.addEventListener('click', function () { reveal(i); });
+  });
+
+  /* For testing: feed a sentence as if it had been heard. */
+  window.heardText = function (text) { handleResult({ resultIndex: 0, results: [[{ transcript: text }]] }); };
 })();
 </script>
 
-</body>
-</html>
+</body></html>
