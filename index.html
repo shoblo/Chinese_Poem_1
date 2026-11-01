@@ -1,8 +1,5 @@
 <!doctype html>
-<html lang="zh-CN">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<html lang="zh-CN"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>登鹳雀楼</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -39,28 +36,68 @@ body {
 .controls {
   display: flex;
   flex-wrap: wrap;
-  align-items: center;
+  align-items: flex-start;
   justify-content: space-between;
-  gap: 16px 24px;
+  gap: 20px 24px;
 }
 .caption { flex: 1 1 240px; min-width: 0; }
-.caption .verse { font-family: var(--font-brush); font-size: 30px; line-height: 1.3; margin: 0; }
-.caption .gloss { margin: 4px 0 0; color: var(--ink-soft); font-size: 15px; min-height: 1.7em; }
-.start {
+.caption .title { font-family: var(--font-brush); font-size: 30px; font-weight: 400; line-height: 1.3; margin: 0 0 6px; }
+.lines { display: flex; flex-direction: column; gap: 2px; margin: 0; padding: 0; list-style: none; }
+.line {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  align-self: flex-start;
+  padding: 2px 0;
+  background: none;
+  border: 0;
   font-family: var(--font-brush);
-  font-size: 24px;
-  letter-spacing: 0.25em;
-  padding: 10px 26px 10px calc(26px + 0.25em);
+  font-size: 30px;
+  line-height: 1.35;
+  letter-spacing: 0.08em;
+  color: var(--ink-soft);
+  cursor: pointer;
+  text-align: left;
+  transition: color 0.6s ease;
+}
+.line::before {
+  content: '';
+  width: 12px;
+  height: 12px;
+  flex: 0 0 auto;
+  border: 1.5px solid var(--ink);
+  background: transparent;
+  transition: background-color 0.6s ease;
+}
+.line.done { color: var(--ink); }
+.line.done::before { background: var(--ink); }
+.line:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+.caption .gloss { margin: 8px 0 0; color: var(--ink-soft); font-size: 15px; min-height: 1.7em; }
+.voice { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; flex: 0 0 auto; max-width: 100%; }
+.mic {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-brush);
+  font-size: 26px;
+  letter-spacing: 0.15em;
+  padding: 12px 26px 12px 22px;
   background: var(--seal);
   color: var(--paper);
   border: 0;
   border-radius: 2px;
   cursor: pointer;
-  flex: 0 0 auto;
 }
-.start:hover:not(:disabled) { background: #000; }
-.start:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
-.start:disabled { opacity: 0.55; cursor: default; }
+.mic svg { width: 26px; height: 26px; flex: 0 0 auto; }
+.mic:hover { background: #000; }
+.mic:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+.mic.on { background: #b3342a; animation: pulse 1.6s ease-out infinite; }
+@keyframes pulse {
+  0% { box-shadow: 0 0 0 0 rgba(179, 52, 42, 0.45); }
+  100% { box-shadow: 0 0 0 16px rgba(179, 52, 42, 0); }
+}
+.status { margin: 0; max-width: 17em; min-height: 1.7em; font-size: 14px; color: var(--ink-soft); }
+.heard { margin: 0; max-width: 17em; min-height: 1.4em; font-size: 13px; color: var(--ink-soft); opacity: 0.8; }
 .note { margin: 0; font-size: 13px; color: var(--ink-soft); }
 .chars { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 8px 16px; }
 .char-lines { display: flex; flex-direction: column; gap: 8px; }
@@ -83,106 +120,76 @@ body {
 .char:hover { background: var(--ink); color: var(--paper); }
 .char:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
 
-.poem { font-family: var(--font-brush); fill: #1c1c1c; text-anchor: middle; }
-.poem text { transition: opacity 0.9s ease; }
-[data-s] { transition: fill 2s ease, stroke 2s ease; }
-#sun { transition: transform 4.2s ease-out; }
-#figure { transition: transform 3.4s ease-in-out; }
-.flow { opacity: 0; transition: opacity 1.2s ease, stroke 2s ease; }
-.flowing .flow { opacity: 0.9; animation: flow 1.6s linear infinite; }
-.flowing .flow.slow { animation-duration: 2.4s; }
-@keyframes flow { to { stroke-dashoffset: 30; } }
-.running #birds { animation: drift 9s ease-in-out infinite alternate; }
-.running #cloudsA { animation: cloud 18s ease-in-out infinite alternate; }
-.running #cloudsB { animation: cloud 24s ease-in-out infinite alternate-reverse; }
-@keyframes drift { from { transform: translate(0, 0); } to { transform: translate(150px, -14px); } }
-@keyframes cloud { from { transform: translateX(0); } to { transform: translateX(36px); } }
+.stagelayer { opacity: 0; transition: opacity 2.2s ease; }
+.s1 #c1, .s2 #c2, .s3 #c3, .s4 #c4 { opacity: 1; }
+#scene { border-radius: 4px; }
+#halo { opacity: 0; transition: opacity 1.6s ease; pointer-events: none; }
+.s1 #halo { opacity: 1; animation: breathe 3.6s ease-in-out infinite; transform-origin: 500px 300px; }
+@keyframes breathe { 0%, 100% { transform: scale(0.92); opacity: 0.55; } 50% { transform: scale(1.12); opacity: 1; } }
+#glit { opacity: 0; transition: opacity 1.6s ease; pointer-events: none; }
+.s2 #glit { opacity: 1; }
+#glit ellipse { fill: #fffbe6; opacity: 0; animation: twinkle 2.6s ease-in-out infinite; }
+@keyframes twinkle { 0%, 100% { opacity: 0; transform: translateX(0); } 50% { opacity: 0.85; transform: translateX(14px); } }
+#flyers { opacity: 0; transition: opacity 1.6s ease; pointer-events: none; }
+.s3 #flyers { opacity: 1; }
+.fly { animation: fly 30s linear infinite; }
+.fly .wing { fill: none; stroke: #4d4640; stroke-width: 3.5; stroke-linecap: round; stroke-linejoin: round; transform-box: fill-box; transform-origin: 50% 100%; animation: flap 0.9s ease-in-out infinite; }
+@keyframes fly { from { transform: translateX(-120px); } to { transform: translateX(1800px); } }
+@keyframes flap { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(0.35); } }
+#girl, #boy { cursor: pointer; transform-box: fill-box; transform-origin: 50% 85%; }
+#girl:focus-visible, #boy:focus-visible { outline: 3px solid #fff; }
 @media (prefers-reduced-motion: reduce) {
-  #sun, #figure, .poem text, .flow, [data-s] { transition: none; }
-  .running #birds, .running #cloudsA, .running #cloudsB, .flowing .flow { animation: none; }
+  .mic.on { animation: none; }
+  .stagelayer, .line, .line::before, #halo, #glit, #flyers { transition: none; }
+  .s1 #halo, #glit ellipse, .fly, .fly .wing { animation: none; }
+  #glit ellipse { opacity: 0.5; }
 }
 </style>
 
-<style>body{margin:0}[hidden]{display:none!important}</style>
-</head>
-<body>
+<style>body{margin:0}[hidden]{display:none!important}</style></head><body>
 <main class="page">
-<svg id="scene" viewBox="0 0 680 480" role="img" xmlns="http://www.w3.org/2000/svg">
+<svg id="scene" viewBox="0 0 1672 941" role="img" xmlns="http://www.w3.org/2000/svg">
 <title>登鹳雀楼</title>
-<desc>黑白水墨风景：落日靠着远山，黄河流向天边，一座高楼上有人影远望，左上角竖排题着王之涣的《登鹳雀楼》。随着诗句出现，画面分四段由黑白变成彩色。</desc>
-<rect x="0" y="0" width="680" height="480" fill="#f0f0ee"/>
-<rect data-s="3" data-fill="#f3d9b1" x="0" y="0" width="680" height="260" fill="#e4e4e2"/>
-<rect data-s="3" data-fill="#f0c996" x="0" y="150" width="680" height="110" fill="#d8d8d6"/>
-<g id="sun">
-<circle data-s="1" data-fill="#eeb98a" cx="470" cy="215" r="62" fill="#cfcfcd"/>
-<circle data-s="1" data-fill="#cf4a3c" cx="470" cy="215" r="46" fill="#3a3a3a"/>
-</g>
-<g id="cloudsA">
-<ellipse data-s="3" data-fill="#f8ebd0" cx="170" cy="100" rx="60" ry="9" fill="#f5f5f3"/>
-<ellipse data-s="3" data-fill="#f8ebd0" cx="205" cy="90" rx="38" ry="7" fill="#f5f5f3"/>
-</g>
-<g id="cloudsB">
-<ellipse data-s="3" data-fill="#f8ebd0" cx="560" cy="120" rx="52" ry="8" fill="#f5f5f3"/>
-<ellipse data-s="3" data-fill="#f8ebd0" cx="520" cy="110" rx="30" ry="6" fill="#f5f5f3"/>
-</g>
-<path data-s="1" data-fill="#9a8a82" d="M280 250 L340 222 L400 238 L520 236 L580 205 L640 228 L680 220 L680 252 Z" fill="#9c9c9a"/>
-<path data-s="1" data-fill="#5d5654" d="M330 262 L400 240 L470 252 L540 234 L610 248 L680 238 L680 272 L330 272 Z" fill="#4e4e4e"/>
-<rect data-s="2" data-fill="#d8c79c" x="0" y="250" width="680" height="230" fill="#cfcfcc"/>
-<rect data-s="2" data-fill="#f6e6c4" x="0" y="244" width="680" height="14" fill="#f0f0ee" opacity="0.6"/>
-<path data-s="2" data-fill="#d6a940" d="M0 256 L170 256 C260 262 330 275 380 300 C430 330 470 360 520 400 C540 420 560 440 580 480 L330 480 C340 450 330 420 290 395 C240 365 150 330 90 310 C50 298 20 290 0 288 Z" fill="#ececea"/>
-<path data-s="2" data-stroke="#f0d88a" d="M20 266 C90 268 160 270 230 282" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round"/>
-<path data-s="2" data-stroke="#f0d88a" d="M260 300 C320 318 380 345 430 385" fill="none" stroke="#ffffff" stroke-width="1.5" stroke-linecap="round"/>
-<path data-s="2" data-stroke="#b98a2c" d="M300 330 C340 350 400 390 440 430" fill="none" stroke="#8a8a88" stroke-width="1.5" stroke-linecap="round"/>
-<path data-s="2" data-stroke="#b98a2c" d="M120 288 C180 296 230 312 270 340" fill="none" stroke="#8a8a88" stroke-width="1.5" stroke-linecap="round"/>
-<path class="flow" data-s="2" data-stroke="#f6e7ae" d="M10 272 C100 282 210 300 270 330 C340 362 400 392 420 420 C435 440 445 460 450 480" fill="none" stroke="#ffffff" stroke-width="2.5" stroke-linecap="round" stroke-dasharray="12 18"/>
-<path class="flow slow" data-s="2" data-stroke="#b98a2c" transform="translate(40 0)" d="M10 272 C100 282 210 300 270 330 C340 362 400 392 420 420 C435 440 445 460 450 480" fill="none" stroke="#8a8a88" stroke-width="1.5" stroke-linecap="round" stroke-dasharray="8 22"/>
-<path data-s="4" data-fill="#6e6a4a" d="M0 480 L0 400 C40 380 120 380 200 420 C240 440 280 460 300 480 Z" fill="#5a5a58"/>
-<rect data-s="4" data-fill="#5a4a3a" x="60" y="396" width="100" height="14" fill="#3a3a3a"/>
-<rect data-s="4" data-fill="#a8452f" x="72" y="350" width="76" height="46" fill="#7a7a78"/>
-<rect data-s="4" data-fill="#4a2a20" x="84" y="362" width="12" height="34" fill="#262626"/>
-<rect data-s="4" data-fill="#4a2a20" x="104" y="362" width="12" height="34" fill="#262626"/>
-<rect data-s="4" data-fill="#4a2a20" x="124" y="362" width="12" height="34" fill="#262626"/>
-<polygon data-s="4" data-fill="#3d3a3a" points="55,350 165,350 148,334 72,334" fill="#2a2a2a"/>
-<rect data-s="4" data-fill="#b84a33" x="80" y="308" width="60" height="26" fill="#858583"/>
-<rect data-s="4" data-fill="#4a2a20" x="92" y="316" width="10" height="18" fill="#262626"/>
-<rect data-s="4" data-fill="#4a2a20" x="118" y="316" width="10" height="18" fill="#262626"/>
-<polygon data-s="4" data-fill="#3d3a3a" points="64,308 156,308 138,294 82,294" fill="#2a2a2a"/>
-<rect data-s="4" data-fill="#c9654a" x="90" y="268" width="40" height="26" fill="#a0a09e"/>
-<polygon data-s="4" data-fill="#3d3a3a" points="76,268 144,268 128,254 92,254" fill="#2a2a2a"/>
-<rect data-s="4" data-fill="#3d3a3a" x="108" y="238" width="4" height="16" fill="#2a2a2a"/>
-<rect data-s="4" data-fill="#3d3a3a" x="105" y="236" width="10" height="4" fill="#2a2a2a"/>
-<g id="figure" style="transform: translateY(0px)">
-<circle data-s="4" data-fill="#2b2522" cx="110" cy="277" r="3.5" fill="#1c1c1c" stroke="#f0f0ee" stroke-width="0.8"/>
-<polygon data-s="4" data-fill="#2b2522" points="104,282 116,282 118,294 102,294" fill="#1c1c1c" stroke="#f0f0ee" stroke-width="0.8"/>
-</g>
-<rect data-s="4" data-fill="#3b2f26" x="228" y="418" width="4" height="22" fill="#222222"/>
-<ellipse data-s="4" data-fill="#4f5a3a" cx="230" cy="408" rx="20" ry="16" fill="#3c3c3c"/>
-<rect data-s="4" data-fill="#3b2f26" x="258" y="432" width="3" height="18" fill="#222222"/>
-<ellipse data-s="4" data-fill="#5d6a42" cx="259" cy="424" rx="14" ry="12" fill="#4a4a4a"/>
-<g id="birds">
-<path data-s="3" data-stroke="#5d5654" d="M240 130 q8 -8 16 0 q8 -8 16 0" fill="none" stroke="#3a3a3a" stroke-width="1.5" stroke-linecap="round"/>
-<path data-s="3" data-stroke="#5d5654" d="M300 150 q6 -6 12 0 q6 -6 12 0" fill="none" stroke="#3a3a3a" stroke-width="1.5" stroke-linecap="round"/>
-<path data-s="3" data-stroke="#5d5654" d="M340 118 q5 -5 10 0 q5 -5 10 0" fill="none" stroke="#3a3a3a" stroke-width="1.5" stroke-linecap="round"/>
-</g>
-<g class="poem">
-<text font-size="19"><tspan x="92" y="46">登</tspan><tspan x="92" y="68">鹳</tspan><tspan x="92" y="90">雀</tspan><tspan x="92" y="112">楼</tspan></text>
-<text font-size="12"><tspan x="92" y="146">唐</tspan><tspan x="92" y="161">王</tspan><tspan x="92" y="176">之</tspan><tspan x="92" y="191">涣</tspan></text>
-<text id="v1" font-size="17"><tspan x="62" y="46">白</tspan><tspan x="62" y="65">日</tspan><tspan x="62" y="84">依</tspan><tspan x="62" y="103">山</tspan><tspan x="62" y="122">尽</tspan></text>
-<text id="v2" font-size="17"><tspan x="62" y="151">黄</tspan><tspan x="62" y="170">河</tspan><tspan x="62" y="189">入</tspan><tspan x="62" y="208">海</tspan><tspan x="62" y="227">流</tspan></text>
-<text id="v3" font-size="17"><tspan x="32" y="46">欲</tspan><tspan x="32" y="65">穷</tspan><tspan x="32" y="84">千</tspan><tspan x="32" y="103">里</tspan><tspan x="32" y="122">目</tspan></text>
-<text id="v4" font-size="17"><tspan x="32" y="151">更</tspan><tspan x="32" y="170">上</tspan><tspan x="32" y="189">一</tspan><tspan x="32" y="208">层</tspan><tspan x="32" y="227">楼</tspan></text>
-</g>
-<rect data-s="4" data-fill="#b3342a" x="612" y="424" width="28" height="28" fill="#2e2e2e"/>
-<rect x="618" y="430" width="16" height="16" fill="none" stroke="#f0f0ee" stroke-width="1.5"/>
-<rect data-s="4" data-stroke="#5a4a3a" x="6" y="6" width="668" height="468" fill="none" stroke="#3a3a3a" stroke-width="1"/>
+<desc>水彩画：小朋友和穿着小企鹅衣服的咕嘎站在高楼的栏杆边，远处落日、黄河和群山。随着诗句出现，画面分四段由黑白变成彩色。</desc>
+<defs>
+<filter id="gsStatic" color-interpolation-filters="sRGB"><feColorMatrix type="saturate" values="0"/></filter>
+<filter id="gsGirl" color-interpolation-filters="sRGB"><feColorMatrix id="gsm" type="saturate" values="0"/></filter>
+<filter id="soft" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur stdDeviation="26"/></filter>
+<mask id="m1" maskUnits="userSpaceOnUse" x="0" y="0" width="1672" height="941"><polygon fill="#fff" filter="url(#soft)" points="0,250 960,250 985,300 1480,300 1480,470 1000,470 700,455 0,455"/></mask>
+<mask id="m2" maskUnits="userSpaceOnUse" x="0" y="0" width="1672" height="941"><polygon fill="#fff" filter="url(#soft)" points="0,440 1500,440 1500,560 1180,640 900,640 835,640 830,740 560,735 470,790 300,830 0,770"/></mask>
+<mask id="m3" maskUnits="userSpaceOnUse" x="0" y="0" width="1672" height="941"><polygon fill="#fff" filter="url(#soft)" points="0,0 960,0 985,60 1100,180 1480,260 1480,300 0,300"/></mask>
+<radialGradient id="haloG"><stop offset="0" stop-color="#fff6cf" stop-opacity="0.75"/><stop offset="0.5" stop-color="#ffe9a8" stop-opacity="0.3"/><stop offset="1" stop-color="#ffe9a8" stop-opacity="0"/></radialGradient>
+<clipPath id="riverClip"><polygon points="0,652 100,642 200,630 300,616 400,606 470,594 590,568 520,548 430,505 432,493 500,484 560,465 600,450 700,450 780,470 850,490 900,520 902,552 880,595 830,620 760,645 700,670 620,692 560,715 500,732 440,746 360,766 330,772 260,766 180,776 90,776 0,772"/></clipPath>
+</defs>
+<image href="base.jpg" x="0" y="0" width="1672" height="941" filter="url(#gsStatic)"/>
+<g id="c1" class="stagelayer" mask="url(#m1)"><image href="base.jpg" x="0" y="0" width="1672" height="941"/></g>
+<g id="c2" class="stagelayer" mask="url(#m2)"><image href="base.jpg" x="0" y="0" width="1672" height="941"/></g>
+<g id="c3" class="stagelayer" mask="url(#m3)"><image href="base.jpg" x="0" y="0" width="1672" height="941"/></g>
+<g id="c4" class="stagelayer"><image href="base.jpg" x="0" y="0" width="1672" height="941"/></g>
+<circle id="halo" cx="500" cy="300" r="150" fill="url(#haloG)"/>
+<g id="glit" clip-path="url(#riverClip)"><ellipse cx="447" cy="627" rx="15" ry="2.6" style="animation-delay:1.39s;animation-duration:2.64s"/><ellipse cx="511" cy="498" rx="23" ry="2.6" style="animation-delay:0.18s;animation-duration:2.31s"/><ellipse cx="569" cy="516" rx="18" ry="2.6" style="animation-delay:1.63s;animation-duration:3.34s"/><ellipse cx="357" cy="762" rx="15" ry="2.6" style="animation-delay:2.23s;animation-duration:2.55s"/><ellipse cx="163" cy="636" rx="27" ry="2.6" style="animation-delay:0.97s;animation-duration:2.86s"/><ellipse cx="629" cy="528" rx="25" ry="2.6" style="animation-delay:1.37s;animation-duration:3.25s"/><ellipse cx="259" cy="764" rx="16" ry="2.6" style="animation-delay:1.09s;animation-duration:3.11s"/><ellipse cx="508" cy="498" rx="27" ry="2.6" style="animation-delay:1.99s;animation-duration:2.89s"/><ellipse cx="282" cy="672" rx="26" ry="2.6" style="animation-delay:1.51s;animation-duration:2.75s"/><ellipse cx="850" cy="602" rx="27" ry="2.6" style="animation-delay:0.16s;animation-duration:3.04s"/><ellipse cx="489" cy="630" rx="14" ry="2.6" style="animation-delay:1.2s;animation-duration:2.4s"/><ellipse cx="431" cy="651" rx="17" ry="2.6" style="animation-delay:0.64s;animation-duration:2.67s"/><ellipse cx="579" cy="691" rx="17" ry="2.6" style="animation-delay:0.46s;animation-duration:2.48s"/><ellipse cx="507" cy="614" rx="19" ry="2.6" style="animation-delay:0.01s;animation-duration:2.7s"/><ellipse cx="522" cy="690" rx="28" ry="2.6" style="animation-delay:1.34s;animation-duration:2.94s"/><ellipse cx="49" cy="738" rx="30" ry="2.6" style="animation-delay:2.27s;animation-duration:3.16s"/><ellipse cx="492" cy="512" rx="27" ry="2.6" style="animation-delay:0.16s;animation-duration:2.28s"/><ellipse cx="485" cy="495" rx="31" ry="2.6" style="animation-delay:1.6s;animation-duration:2.38s"/><ellipse cx="573" cy="699" rx="23" ry="2.6" style="animation-delay:1.26s;animation-duration:2.3s"/><ellipse cx="475" cy="497" rx="25" ry="2.6" style="animation-delay:0.07s;animation-duration:2.83s"/><ellipse cx="486" cy="525" rx="29" ry="2.6" style="animation-delay:1.38s;animation-duration:3.13s"/><ellipse cx="460" cy="660" rx="34" ry="2.6" style="animation-delay:2.22s;animation-duration:3.17s"/><ellipse cx="666" cy="523" rx="24" ry="2.6" style="animation-delay:0.92s;animation-duration:2.23s"/><ellipse cx="861" cy="593" rx="33" ry="2.6" style="animation-delay:2.57s;animation-duration:3.35s"/><ellipse cx="457" cy="621" rx="32" ry="2.6" style="animation-delay:2.19s;animation-duration:2.78s"/><ellipse cx="720" cy="477" rx="27" ry="2.6" style="animation-delay:2.37s;animation-duration:3.14s"/><ellipse cx="299" cy="706" rx="33" ry="2.6" style="animation-delay:1.03s;animation-duration:2.68s"/><ellipse cx="652" cy="504" rx="17" ry="2.6" style="animation-delay:0.39s;animation-duration:3.29s"/><ellipse cx="132" cy="714" rx="34" ry="2.6" style="animation-delay:1.71s;animation-duration:2.62s"/><ellipse cx="585" cy="619" rx="33" ry="2.6" style="animation-delay:1.13s;animation-duration:3.25s"/><ellipse cx="463" cy="613" rx="19" ry="2.6" style="animation-delay:1.09s;animation-duration:2.36s"/><ellipse cx="814" cy="585" rx="32" ry="2.6" style="animation-delay:1.3s;animation-duration:2.84s"/><ellipse cx="421" cy="658" rx="17" ry="2.6" style="animation-delay:1.23s;animation-duration:3.07s"/><ellipse cx="706" cy="484" rx="25" ry="2.6" style="animation-delay:0.65s;animation-duration:2.53s"/></g>
+<g filter="url(#gsGirl)"><g id="girl" tabindex="0" role="button" aria-label="咕嘎，点一下跳一跳"><image href="girl.png" x="909" y="368" width="291" height="515"/></g></g>
+<g filter="url(#gsGirl)"><g id="boy" tabindex="0" role="button" aria-label="小朋友，点一下跳一跳"><image href="boy.png" x="1158" y="265" width="317" height="664"/></g></g>
+<g filter="url(#gsGirl)" style="pointer-events:none"><image href="girl_beam.png" x="909" y="368" width="291" height="515"/><image href="boy_beam.png" x="1158" y="265" width="317" height="664"/></g>
+<g id="flyers"><g class="fly" style="animation-delay:-4s;animation-duration:34s"><g transform="translate(0,150) scale(1.4)"><path class="wing" d="M-16 0 Q-8 -11 0 0 Q8 -11 16 0"/></g></g><g class="fly" style="animation-delay:-15s;animation-duration:40s"><g transform="translate(0,240) scale(1.0)"><path class="wing" d="M-16 0 Q-8 -11 0 0 Q8 -11 16 0"/></g></g><g class="fly" style="animation-delay:-24s;animation-duration:36s"><g transform="translate(0,95) scale(0.8)"><path class="wing" d="M-16 0 Q-8 -11 0 0 Q8 -11 16 0"/></g></g></g>
 </svg>
 
 <div class="controls">
-<div class="caption" aria-live="polite">
-<p class="verse" id="verse">登鹳雀楼</p>
-<p class="gloss" id="gloss"></p>
+<div class="caption">
+<h1 class="title">登鹳雀楼</h1>
+<ul class="lines" aria-label="诗句">
+<li><button class="line" type="button" data-i="0">白日依山尽</button></li>
+<li><button class="line" type="button" data-i="1">黄河入海流</button></li>
+<li><button class="line" type="button" data-i="2">欲穷千里目</button></li>
+<li><button class="line" type="button" data-i="3">更上一层楼</button></li>
+</ul>
+<p class="gloss" id="gloss" aria-live="polite"></p>
 </div>
-<button class="start" id="start" type="button">开始</button>
+<div class="voice">
+<button class="mic" id="mic" type="button" aria-pressed="false"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3"/></svg><span id="micLabel">开始读</span></button>
+<p class="status" id="status" aria-live="polite"></p>
+<p class="heard" id="heard" aria-hidden="true"></p>
+</div>
 </div>
 <nav class="chars" aria-label="逐字解释">
 <div class="char-lines">
@@ -197,89 +204,235 @@ body {
 <script>
 (function () {
   var $ = function (id) { return document.getElementById(id); };
-  var scene = $('scene'), sun = $('sun'), figure = $('figure');
-  var btn = $('start'), verseEl = $('verse'), glossEl = $('gloss');
-  var tinted = scene.querySelectorAll('[data-s]');
-  var verses = [
-    { line: '白日依山尽', gloss: '太阳靠着西边的山，慢慢沉下去。' },
-    { line: '黄河入海流', gloss: '黄河奔腾向东，流向远方的大海。' },
-    { line: '欲穷千里目', gloss: '想把千里之外的景色都看个够。' },
-    { line: '更上一层楼', gloss: '那就再登上一层楼。' }
+  var scene = $('scene'), girl = $('girl'), boy = $('boy'), gsm = $('gsm');
+  var micBtn = $('mic'), micLabel = $('micLabel'), statusEl = $('status'), heardEl = $('heard'), glossEl = $('gloss');
+  var lineBtns = Array.prototype.slice.call(document.querySelectorAll('.line'));
+  var SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+  var LINES = ['白日依山尽', '黄河入海流', '欲穷千里目', '更上一层楼'];
+  var GLOSS = [
+    '太阳靠着西边的山，慢慢沉下去。',
+    '黄河奔腾向东，流向远方的大海。',
+    '想把千里之外的景色都看个够。',
+    '咕嘎和小朋友一起跳一跳，再登上一层楼！'
   ];
-  var running = false;
+  var FINAL = '站得高，才看得远。';
+  var NEED = 3;
+  var done = [false, false, false, false];
+  var listening = false, want = false, fatal = false, rec = null, restartTimer = 0, revealTimers = [];
 
-  function colorize(n) {
-    var els = scene.querySelectorAll('[data-s="' + n + '"]');
-    for (var i = 0; i < els.length; i++) {
-      var el = els[i];
-      if (el.getAttribute('data-fill')) el.style.fill = el.getAttribute('data-fill');
-      if (el.getAttribute('data-stroke')) el.style.stroke = el.getAttribute('data-stroke');
+  /* Characters that sound alike are treated as the same, because speech recognition often
+     writes a different character for a child's voice. The first character of each group is the one kept. */
+  var GROUPS = ['白百柏摆拜', '日', '依一衣医伊', '山闪善扇杉', '尽进近紧金今劲仅', '黄皇煌凰',
+    '河和合何', '入如', '海还害', '流留刘', '欲预遇育玉', '穷琼', '千前钱牵', '里理李力',
+    '目木母幕慕', '更耕跟根', '上尚商', '层曾', '楼漏搂'];
+  var CANON = {};
+  GROUPS.forEach(function (g) { for (var i = 0; i < g.length; i++) CANON[g.charAt(i)] = g.charAt(0); });
+
+  function canon(text) {
+    var out = [], i, c;
+    for (i = 0; i < text.length; i++) {
+      c = text.charAt(i);
+      if (c >= '一' && c <= '鿿') out.push(CANON[c] || c);
+    }
+    return out;
+  }
+  function lcs(a, b) {
+    var prev = [], cur, i, j;
+    for (j = 0; j <= b.length; j++) prev.push(0);
+    for (i = 1; i <= a.length; i++) {
+      cur = [0];
+      for (j = 1; j <= b.length; j++) {
+        cur.push(a[i - 1] === b[j - 1] ? prev[j - 1] + 1 : Math.max(prev[j], cur[j - 1]));
+      }
+      prev = cur;
+    }
+    return prev[b.length];
+  }
+  var LINE_CANON = LINES.map(canon);
+
+  function findLines(texts) {
+    var found = [], i, t, k, tail;
+    for (i = 0; i < 4; i++) {
+      if (done[i]) continue;
+      for (k = 0; k < texts.length; k++) {
+        tail = canon(texts[k]).slice(-60);
+        if (lcs(LINE_CANON[i], tail) >= NEED) { found.push(i); break; }
+      }
+    }
+    return found;
+  }
+
+  function allDone() { return done.every(function (d) { return d; }); }
+
+  function setStatus(text) { statusEl.textContent = text; }
+
+  function setListening(on) {
+    listening = on;
+    micBtn.classList.toggle('on', on);
+    micBtn.setAttribute('aria-pressed', on ? 'true' : 'false');
+    micLabel.textContent = on ? '我在听' : (allDone() ? '再读一遍' : '开始读');
+    if (!on) heardEl.textContent = '';
+  }
+
+  var satTimer = 0, hopAnims = [], hopTimer = 0;
+  var reduce = window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function setSat(v) { gsm.setAttribute('values', String(v)); }
+  function tweenSat(from, to, ms) {
+    cancelAnimationFrame(satTimer);
+    if (reduce || ms <= 0) { setSat(to); return; }
+    var t0 = performance.now();
+    (function step(now) {
+      var k = Math.min(1, (now - t0) / ms);
+      setSat(from + (to - from) * k);
+      if (k < 1) satTimer = requestAnimationFrame(step);
+    })(t0);
+  }
+
+  function hopOne(el, times, delay) {
+    if (!el.animate || reduce) return null;
+    return el.animate([
+      { transform: 'translateY(0px) scale(1,1)' },
+      { transform: 'translateY(0px) scale(1.05,0.93)', offset: 0.18 },
+      { transform: 'translateY(-40px) scale(0.97,1.05)', offset: 0.5 },
+      { transform: 'translateY(0px) scale(1.05,0.93)', offset: 0.82 },
+      { transform: 'translateY(0px) scale(1,1)' }
+    ], { duration: 720, iterations: times, delay: delay || 0, easing: 'ease-in-out' });
+  }
+  function hopBoth(times) {
+    hopAnims.forEach(function (a) { if (a) a.cancel(); });
+    hopAnims = [hopOne(girl, times, 0), hopOne(boy, times, 140)];
+  }
+
+  function reveal(i) {
+    if (done[i]) return;
+    done[i] = true;
+    lineBtns[i].classList.add('done');
+    glossEl.textContent = GLOSS[i];
+    scene.classList.add('s' + (i + 1));
+    if (i === 3) {
+      tweenSat(0, 1, 2200);
+      clearTimeout(hopTimer);
+      hopTimer = setTimeout(function () { hopBoth(3); }, 1500);
+    }
+    if (allDone()) {
+      glossEl.textContent = FINAL;
+      stopListening();
+      setStatus('');
     }
   }
 
-  function light(n) {
-    $('v' + n).style.opacity = 1;
-    verseEl.textContent = verses[n - 1].line;
-    glossEl.textContent = verses[n - 1].gloss;
-    colorize(n);
-  }
-
-  function reset() {
-    var i;
-    sun.style.transition = 'none';
-    figure.style.transition = 'none';
-    for (i = 0; i < tinted.length; i++) {
-      tinted[i].style.transition = 'none';
-      tinted[i].style.fill = '';
-      tinted[i].style.stroke = '';
-    }
-    sun.style.transform = 'translateY(-50px)';
-    figure.style.transform = 'translateY(102px)';
-    for (i = 1; i <= 4; i++) $('v' + i).style.opacity = 0.15;
-    scene.classList.remove('flowing');
-    void scene.getBoundingClientRect();
-    sun.style.transition = '';
-    figure.style.transition = '';
-    for (i = 0; i < tinted.length; i++) tinted[i].style.transition = '';
-  }
-
-  function play() {
-    if (running) return;
-    running = true;
-    btn.disabled = true;
-    btn.textContent = '进行中';
-    verseEl.textContent = '登鹳雀楼';
+  function resetAll() {
+    revealTimers.forEach(function (t) { clearTimeout(t); });
+    revealTimers = [];
+    clearTimeout(hopTimer);
+    hopAnims.forEach(function (a) { if (a) a.cancel(); }); hopAnims = [];
+    cancelAnimationFrame(satTimer);
+    setSat(0);
+    scene.setAttribute('class', '');
+    done = [false, false, false, false];
+    lineBtns.forEach(function (b) { b.classList.remove('done'); });
     glossEl.textContent = '';
-    reset();
-    scene.classList.add('running');
-
-    setTimeout(function () {
-      light(1);
-      sun.style.transform = 'translateY(0px)';
-    }, 400);
-    setTimeout(function () {
-      light(2);
-      scene.classList.add('flowing');
-    }, 6800);
-    setTimeout(function () {
-      light(3);
-      figure.style.transform = 'translateY(40px)';
-    }, 13200);
-    setTimeout(function () {
-      light(4);
-      figure.style.transform = 'translateY(0px)';
-    }, 19600);
-    setTimeout(function () {
-      glossEl.textContent = '站得高，才看得远。';
-      running = false;
-      btn.disabled = false;
-      btn.textContent = '重看';
-    }, 24000);
+    heardEl.textContent = '';
   }
 
-  btn.addEventListener('click', play);
+  [girl, boy].forEach(function (el) {
+    el.addEventListener('click', function () { hopAnims.push(hopOne(el, 1, 0)); });
+    el.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); hopAnims.push(hopOne(el, 1, 0)); } });
+  });
+
+  /* ----- listening ----- */
+  function handleResult(e) {
+    var results = Array.prototype.slice.call(e.results), texts = [], i, j, primary, first = e.resultIndex || 0;
+    primary = results.map(function (r) { return r[0] ? r[0].transcript : ''; }).join('');
+    texts.push(primary);
+    for (i = first; i < results.length; i++) {
+      for (j = 1; j < results[i].length; j++) texts.push(results[i][j].transcript);
+    }
+    var shown = primary.replace(/[^一-鿿]/g, '').slice(-12);
+    heardEl.textContent = shown ? '听到：' + shown : '';
+    var found = findLines(texts);
+    found.forEach(function (idx, k) {
+      var t = setTimeout(function () { reveal(idx); }, k * 900);
+      revealTimers.push(t);
+    });
+  }
+
+  function handleError(e) {
+    var code = e && e.error;
+    if (code === 'not-allowed' || code === 'service-not-allowed') {
+      fatal = true;
+      setStatus('需要允许使用麦克风。允许后，再点一次“开始读”。也可以直接点一句诗。');
+    } else if (code === 'audio-capture') {
+      fatal = true;
+      setStatus('没有找到麦克风。也可以直接点一句诗。');
+    } else if (code === 'network') {
+      fatal = true;
+      setStatus('没有连上网。听声音需要联网。也可以直接点一句诗。');
+    } else if (code === 'language-not-supported') {
+      fatal = true;
+      setStatus('这个浏览器听不懂中文。也可以直接点一句诗。');
+    }
+  }
+
+  function startRecognition() {
+    if (!want || fatal) return;
+    try {
+      rec = new SR();
+      rec.lang = 'zh-CN';
+      rec.continuous = true;
+      rec.interimResults = true;
+      rec.maxAlternatives = 3;
+      rec.onresult = handleResult;
+      rec.onerror = handleError;
+      rec.onend = function () {
+        if (want && !fatal) {
+          clearTimeout(restartTimer);
+          restartTimer = setTimeout(startRecognition, 250);
+        } else {
+          setListening(false);
+        }
+      };
+      rec.start();
+    } catch (err) {
+      clearTimeout(restartTimer);
+      if (want && !fatal) restartTimer = setTimeout(startRecognition, 400);
+    }
+  }
+
+  function startListening() {
+    if (!SR) {
+      setStatus('这里听不到声音。请用 Chrome 或 Safari 打开，或者直接点一句诗。');
+      return;
+    }
+    fatal = false;
+    want = true;
+    setStatus('');
+    setListening(true);
+    startRecognition();
+  }
+
+  function stopListening() {
+    want = false;
+    clearTimeout(restartTimer);
+    if (rec) { try { rec.onend = null; rec.stop(); } catch (err) {} }
+    rec = null;
+    setListening(false);
+  }
+
+  micBtn.addEventListener('click', function () {
+    if (listening) { stopListening(); setStatus(''); return; }
+    if (allDone()) resetAll();
+    startListening();
+  });
+
+  lineBtns.forEach(function (b, i) {
+    b.addEventListener('click', function () { reveal(i); });
+  });
+
+  /* For testing: feed a sentence as if it had been heard. */
+  window.heardText = function (text) { handleResult({ resultIndex: 0, results: [[{ transcript: text }]] }); };
 })();
 </script>
 
-</body>
-</html>
+</body></html>
